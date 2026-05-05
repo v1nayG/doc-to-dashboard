@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB connection + server start
-const startServer = async () => {
+const startServer = async () => 
     try {
         // If MONGODB_URI is set and valid, connect to MongoDB
         // Otherwise, run without DB (history won't persist but everything else works)
