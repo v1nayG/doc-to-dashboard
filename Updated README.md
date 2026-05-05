@@ -21,7 +21,7 @@ Businesses waste hours manually reading PDFs and spreadsheets to extract insight
 - **🔄 Chart type switcher** — Switch between chart types live
 - **💾 Document history** — Sidebar with all past documents
 - **⬇️ Export** — Download dashboard as PNG
-- **🌙 Dark mode UI** — Premium design system
+  
 
 ## 🛠️ Tech Stack
 
