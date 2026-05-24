@@ -60,12 +60,12 @@ const extractDashboardData = async (text, fileName) => {
       },
       {
         role: 'user',
-        content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${text.substring(0, 30000)}`
+        content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${text.substring(0, 12000)}`
       }
     ],
-    model: 'openai/gpt-oss-120b',
+    model: 'llama-3.3-70b-versatile',
     temperature: 0.3,
-    max_completion_tokens: 8192,
+    max_completion_tokens: 2000,
     top_p: 1,
     stream: false,
     stop: null

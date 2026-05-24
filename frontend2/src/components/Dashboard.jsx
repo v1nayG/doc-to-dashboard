@@ -2,12 +2,15 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import KPICard from './KPICard'
 import ChartCard from './ChartCard'
+import DataEditor from './DataEditor'
 import html2canvas from 'html2canvas'
 
 export default function Dashboard({ data, onReset }) {
   const [exporting, setExporting] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [currentData, setCurrentData] = useState(data)
 
-  const handleExport = async () => {
+  const handleExportPNG = async () => {
     setExporting(true)
     try {
       const el = document.getElementById('dashboard-content')
@@ -17,7 +20,7 @@ export default function Dashboard({ data, onReset }) {
         useCORS: true,
       })
       const link = document.createElement('a')
-      link.download = `${data.title || 'dashboard'}.png`
+      link.download = `${currentData.title || 'dashboard'}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
     } catch (err) {
@@ -26,9 +29,50 @@ export default function Dashboard({ data, onReset }) {
     setExporting(false)
   }
 
-  const kpis   = data.kpis   || []
-  const charts = data.charts || []
-  const tables = data.tables || []
+  const handleExportJSON = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData, null, 2));
+    const link = document.createElement('a');
+    link.href = dataStr;
+    link.download = `${currentData.title || 'dashboard'}_data.json`;
+    link.click();
+  }
+
+  const handleExportCSV = () => {
+    // Basic CSV export for tables
+    let csvContent = "data:text/csv;charset=utf-8,";
+    
+    if (currentData.tables && currentData.tables.length > 0) {
+      currentData.tables.forEach(table => {
+        csvContent += `${table.title}\n`;
+        csvContent += table.headers.join(",") + "\n";
+        table.rows.forEach(row => {
+          // Escape quotes and wrap in quotes to handle commas inside cells
+          const csvRow = row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",");
+          csvContent += csvRow + "\n";
+        });
+        csvContent += "\n";
+      });
+    } else {
+      csvContent += "No table data available\n";
+    }
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${currentData.title || 'dashboard'}_tables.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  const handleSaveEdit = (newData) => {
+    setCurrentData(newData);
+    setIsEditing(false);
+  }
+
+  const kpis   = currentData.kpis   || []
+  const charts = currentData.charts || []
+  const tables = currentData.tables || []
 
   return (
     <motion.div
@@ -36,44 +80,59 @@ export default function Dashboard({ data, onReset }) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
+      {isEditing && (
+        <DataEditor 
+          data={currentData} 
+          onSave={handleSaveEdit} 
+          onClose={() => setIsEditing(false)} 
+        />
+      )}
+
       {/* Header */}
       <div className="dashboard-header">
         <div className="dashboard-title-area">
-          {data.document_type && (
-            <div className="doc-badge">{data.document_type}</div>
+          {currentData.document_type && (
+            <div className="doc-badge">{currentData.document_type}</div>
           )}
-          <h2>{data.title || 'Generated Dashboard'}</h2>
-          {data.fileName && (
-            <p>{data.fileName}</p>
+          <h2>{currentData.title || 'Generated Dashboard'}</h2>
+          {currentData.fileName && (
+            <p>{currentData.fileName}</p>
           )}
         </div>
         <div className="dashboard-actions">
-          <button className="btn btn-ghost" onClick={onReset}>
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 4 4 4 4 15"/>
-              <path d="M15 4L8.5 10.5"/>
-            </svg>
-            New Document
+          <button className="btn btn-ghost" onClick={() => setIsEditing(true)}>
+            Edit Data
           </button>
-          <button className="btn btn-primary" onClick={handleExport} disabled={exporting}>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <button className="btn btn-ghost" onClick={handleExportJSON} style={{ padding: '8px 10px' }}>
+              JSON
+            </button>
+            <button className="btn btn-ghost" onClick={handleExportCSV} style={{ padding: '8px 10px' }}>
+              CSV
+            </button>
+          </div>
+          <button className="btn btn-primary" onClick={handleExportPNG} disabled={exporting}>
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M8 2v9M4 8l4 4 4-4"/><line x1="2" y1="14" x2="14" y2="14"/>
             </svg>
             {exporting ? 'Exporting…' : 'Export PNG'}
+          </button>
+          <button className="btn btn-ghost" onClick={onReset} style={{ marginLeft: '8px' }}>
+            New
           </button>
         </div>
       </div>
 
       <div id="dashboard-content">
         {/* Summary */}
-        {data.summary && (
+        {currentData.summary && (
           <motion.div
             className="summary-card"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
           >
-            <strong>Summary — </strong>{data.summary}
+            <strong>Summary — </strong>{currentData.summary}
           </motion.div>
         )}
 

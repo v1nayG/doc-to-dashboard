@@ -17,7 +17,14 @@ export default function Sidebar({ history, activeId, onSelect, onDelete }) {
   }
 
   return (
-    <div className="sidebar">
+    <motion.div 
+      className="sidebar"
+      initial={{ width: 0, opacity: 0 }}
+      animate={{ width: 256, opacity: 1 }}
+      exit={{ width: 0, opacity: 0 }}
+      transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+      style={{ whiteSpace: 'nowrap' }}
+    >
       <div className="sidebar-header">
         <span className="sidebar-title">History</span>
         {history.length > 0 && (
@@ -67,6 +74,6 @@ export default function Sidebar({ history, activeId, onSelect, onDelete }) {
           ))
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }
