@@ -38,11 +38,11 @@
   width: 34px;
   height: 34px;
   border-radius: 9px;
-  background: linear-gradient(135deg, #6366f1, #818cf8);
+  background: linear-gradient(135deg, #4f46e5, #3730a3);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
 }
 
 .landing-brand {
@@ -71,7 +71,7 @@
 }
 
 .landing-cta-btn {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #4f46e5, #3730a3);
   color: #fff;
   border: none;
   padding: 10px 22px;
@@ -81,12 +81,12 @@
   cursor: pointer;
   font-family: inherit;
   transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
 }
 
 .landing-cta-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
 }
 
 /* ─── Hero ──────────────────────────────────────────────────────────── */
@@ -247,7 +247,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #4f46e5, #3730a3);
   color: #fff;
   border: none;
   padding: 15px 32px;
@@ -257,12 +257,12 @@
   cursor: pointer;
   font-family: inherit;
   transition: all 0.25s;
-  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 6px 24px rgba(79, 70, 229, 0.3);
 }
 
 .hero-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 32px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 10px 32px rgba(79, 70, 229, 0.4);
 }
 
 .hero-btn-ghost {
@@ -562,7 +562,7 @@
 }
 
 .cta-inner {
-  background: linear-gradient(135deg, #1e1b4b, #312e81, #4c1d95);
+  background: linear-gradient(135deg, #1e1b4b, #2e3b8a, #3730a3);
   border-radius: 32px;
   padding: 80px 2rem;
   text-align: center;
@@ -570,8 +570,8 @@
   margin: 0 auto;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 24px 80px rgba(99, 102, 241, 0.2);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 24px 80px rgba(79, 70, 229, 0.2);
+  border: 1px solid rgba(79, 70, 229, 0.3);
 }
 
 .cta-blob {
@@ -621,7 +621,7 @@
   align-items: center;
   gap: 10px;
   background: #fff;
-  color: #4c1d95;
+  color: #3730a3;
   border: none;
   padding: 16px 36px;
   border-radius: 14px;
