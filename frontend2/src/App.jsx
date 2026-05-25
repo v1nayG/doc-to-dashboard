@@ -238,12 +238,12 @@ export default function App() {
                     AI-Powered · Document Intelligence
                   </motion.div>
 
-                  <motion.h1 className="hero-title" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '1rem' }} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.8 }}>
+                  <motion.h1 className="hero-title" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '1rem', color: 'var(--text-primary)' }} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.8 }}>
                     Turn documents into <br />
-                    <span className="hero-title-accent">live dashboards</span>
+                    <span className="hero-title-accent" style={{ color: 'var(--accent)' }}>live dashboards</span>
                   </motion.h1>
 
-                  <motion.p className="hero-desc" style={{ marginBottom: '2rem' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }}>
+                  <motion.p className="hero-desc" style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }}>
                     Upload a PDF, spreadsheet, or image. Gemini AI extracts
                     structured data and builds an interactive dashboard instantly.
                   </motion.p>
