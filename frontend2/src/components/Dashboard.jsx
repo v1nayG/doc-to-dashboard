@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import KPICard from './KPICard'
 import ChartCard from './ChartCard'
@@ -9,6 +9,10 @@ export default function Dashboard({ data, onReset }) {
   const [exporting, setExporting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [currentData, setCurrentData] = useState(data)
+
+  useEffect(() => {
+    setCurrentData(data)
+  }, [data])
 
   const handleExportPNG = async () => {
     setExporting(true)

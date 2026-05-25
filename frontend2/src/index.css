@@ -12,10 +12,10 @@
   --border:         #242424;
   --border-strong:  #2e2e2e;
 
-  /* Primary accent — single, muted blue */
-  --accent:         #3b82f6;
-  --accent-dim:     rgba(59, 130, 246, 0.12);
-  --accent-hover:   #2563eb;
+  /* Primary accent — premium indigo */
+  --accent:         #4f46e5;
+  --accent-dim:     rgba(79, 70, 229, 0.12);
+  --accent-hover:   #3730a3;
 
   /* Text */
   --text-primary:   #e8e8e8;
