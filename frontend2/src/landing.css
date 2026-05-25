@@ -336,14 +336,14 @@
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--text-primary, #e8e8e8);
+  color: #202124;
   line-height: 1.15;
   margin-bottom: 0.85rem;
 }
 
 .section-sub {
   font-size: 1rem;
-  color: var(--text-secondary, #808080);
+  color: #5F6368;
   font-weight: 400;
 }
 
@@ -398,10 +398,10 @@
 }
 
 .desc-card-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.6rem;
+  color: #202124;
+  margin-bottom: 0.5rem;
 }
 
 .desc-card-desc {
@@ -451,17 +451,16 @@
 }
 
 .feature-card-title {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.6rem;
-  color: var(--text-primary, #e8e8e8);
+  color: #202124;
+  margin-bottom: 0.5rem;
 }
 
 .feature-card-desc {
-  font-size: 0.88rem;
-  color: var(--text-secondary, #808080);
-  line-height: 1.7;
+  font-size: 0.9rem;
+  color: #5F6368;
+  line-height: 1.6;
 }
 
 /* ─── About ─────────────────────────────────────────────────────────── */
@@ -484,15 +483,18 @@
   .about-visual { order: -1; }
 }
 
-.about-text .section-title {
-  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+.about-text h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #202124;
+  margin-bottom: 1rem;
 }
 
 .about-desc {
-  font-size: 0.95rem;
-  color: var(--text-secondary, #808080);
-  line-height: 1.8;
-  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: #5F6368;
+  line-height: 1.7;
+  margin-bottom: 2rem;
 }
 
 .about-pills {
