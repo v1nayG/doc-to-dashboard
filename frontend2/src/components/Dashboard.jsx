@@ -18,8 +18,10 @@ export default function Dashboard({ data, onReset }) {
     setExporting(true)
     try {
       const el = document.getElementById('dashboard-content')
+      const theme = document.documentElement.getAttribute('data-theme')
+      const bgColor = theme === 'dark' ? '#202124' : '#FFFFFF'
       const canvas = await html2canvas(el, {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: bgColor,
         scale: 2,
         useCORS: true,
       })
