@@ -19,7 +19,7 @@ export default function Dashboard({ data, onReset }) {
     try {
       const el = document.getElementById('dashboard-content')
       const canvas = await html2canvas(el, {
-        backgroundColor: '#141414',
+        backgroundColor: '#FFFFFF',
         scale: 2,
         useCORS: true,
       })

@@ -84,6 +84,8 @@ const COLORFUL_WORDS = ['Transform', 'Analyze', 'Visualize', 'Understand'];
 
 export default function LandingPage({ onGetStarted }) {
   const [wordIndex, setWordIndex] = useState(0);
+  const [emailFocus, setEmailFocus] = useState(false);
+  const iconColor = emailFocus ? '#1A73E8' : '#80868B';
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, -80]);
@@ -95,7 +97,7 @@ export default function LandingPage({ onGetStarted }) {
     return () => clearInterval(timer);
   }, []);
 
-  const wordColors = ['#6366f1', '#f59e0b', '#10b981', '#ec4899'];
+  const wordColors = ['#1A73E8', '#EA4335', '#FBBC04', '#34A853'];
 
   return (
     <div className="landing">
@@ -218,17 +220,17 @@ export default function LandingPage({ onGetStarted }) {
             transition={{ delay: 0.6, duration: 0.7 }}
           >
             <div className="hero-stat">
-              <span className="hero-stat-value" style={{ color: '#6366f1' }}>5s</span>
+              <span className="hero-stat-value" style={{ color: '#1A73E8' }}>5s</span>
               <span className="hero-stat-label">avg. processing</span>
             </div>
             <div className="hero-stat-sep" />
             <div className="hero-stat">
-              <span className="hero-stat-value" style={{ color: '#10b981' }}>5+</span>
+              <span className="hero-stat-value" style={{ color: '#34A853' }}>5+</span>
               <span className="hero-stat-label">file formats</span>
             </div>
             <div className="hero-stat-sep" />
             <div className="hero-stat">
-              <span className="hero-stat-value" style={{ color: '#f59e0b' }}>0</span>
+              <span className="hero-stat-value" style={{ color: '#FBBC04' }}>0</span>
               <span className="hero-stat-label">manual work</span>
             </div>
           </motion.div>
@@ -244,8 +246,8 @@ export default function LandingPage({ onGetStarted }) {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <span className="section-chip" style={{ background: '#6366f115', color: '#6366f1' }}>How it works</span>
-          <h2 className="section-title">Three steps to <span style={{ color: '#6366f1' }}>instant insights</span></h2>
+          <span className="section-chip" style={{ background: '#1A73E815', color: '#1A73E8' }}>How it works</span>
+          <h2 className="section-title">Three steps to <span style={{ color: '#1A73E8' }}>instant insights</span></h2>
           <p className="section-sub">From raw document to interactive dashboard in seconds</p>
         </motion.div>
 
@@ -291,8 +293,8 @@ export default function LandingPage({ onGetStarted }) {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <span className="section-chip" style={{ background: '#f59e0b15', color: '#f59e0b' }}>Features</span>
-          <h2 className="section-title">Everything you need to <span style={{ color: '#f59e0b' }}>understand your data</span></h2>
+          <span className="section-chip" style={{ background: '#FBBC0415', color: '#FBBC04' }}>Features</span>
+          <h2 className="section-title">Everything you need to <span style={{ color: '#FBBC04' }}>understand your data</span></h2>
           <p className="section-sub">Powerful AI tools wrapped in a beautiful, simple interface</p>
         </motion.div>
 
@@ -327,9 +329,9 @@ export default function LandingPage({ onGetStarted }) {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="section-chip" style={{ background: '#ec489915', color: '#ec4899' }}>About DocDash</span>
+            <span className="section-chip" style={{ background: '#EA433515', color: '#EA4335' }}>About DocDash</span>
             <h2 className="section-title" style={{ textAlign: 'left', marginTop: '1rem' }}>
-              Built for people who <span style={{ color: '#ec4899' }}>work with data</span>
+              Built for people who <span style={{ color: '#EA4335' }}>work with data</span>
             </h2>
             <p className="about-desc">
               DocDash was created to eliminate the hours spent manually reading reports, copy-pasting data into spreadsheets, and building charts from scratch.
@@ -338,10 +340,10 @@ export default function LandingPage({ onGetStarted }) {
               Whether you're a analyst, student, researcher, or business owner — drop in your document and get a full dashboard in under 10 seconds. Powered by Google Gemini's multimodal AI.
             </p>
             <div className="about-pills">
-              <span className="about-pill" style={{ background: '#6366f115', color: '#6366f1', border: '1px solid #6366f130' }}>Google Gemini AI</span>
-              <span className="about-pill" style={{ background: '#10b98115', color: '#10b981', border: '1px solid #10b98130' }}>React + Vite</span>
-              <span className="about-pill" style={{ background: '#f59e0b15', color: '#f59e0b', border: '1px solid #f59e0b30' }}>MongoDB</span>
-              <span className="about-pill" style={{ background: '#3b82f615', color: '#3b82f6', border: '1px solid #3b82f630' }}>Node.js</span>
+              <span className="about-pill">Google Gemini AI</span>
+              <span className="about-pill">React + Vite</span>
+              <span className="about-pill">MongoDB</span>
+              <span className="about-pill">Node.js</span>
             </div>
             <button className="hero-btn-primary" onClick={onGetStarted} style={{ marginTop: '2rem' }} id="about-get-started">
               Try DocDash Free
@@ -363,7 +365,7 @@ export default function LandingPage({ onGetStarted }) {
                 className="about-mock-card"
                 animate={{ y: [0, -8, 0] }}
                 transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-                style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)', color: '#fff' }}
+                style={{ background: '#1A73E8', color: '#fff' }}
               >
                 <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>📊</div>
                 <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>Revenue Report</div>
@@ -373,7 +375,7 @@ export default function LandingPage({ onGetStarted }) {
                 className="about-mock-card"
                 animate={{ y: [0, 8, 0] }}
                 transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut', delay: 1 }}
-                style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', color: '#fff' }}
+                style={{ background: '#34A853', color: '#fff' }}
               >
                 <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>🧠</div>
                 <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>AI Insights Ready</div>
@@ -383,7 +385,7 @@ export default function LandingPage({ onGetStarted }) {
                 className="about-mock-card"
                 animate={{ y: [0, -6, 0] }}
                 transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut', delay: 0.5 }}
-                style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', color: '#fff' }}
+                style={{ background: '#FBBC04', color: '#fff' }}
               >
                 <div style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>⚡</div>
                 <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>Processed in 4.2s</div>
@@ -407,7 +409,7 @@ export default function LandingPage({ onGetStarted }) {
           <div className="cta-blob cta-blob-2" />
           <h2 className="cta-title">
             Ready to stop reading and <br />
-            <span style={{ color: '#a78bfa' }}>start understanding?</span>
+            <span style={{ color: '#1A73E8' }}>start understanding?</span>
           </h2>
           <p className="cta-desc">Join thousands of people who turned their documents into dashboards with DocDash.</p>
           <button className="cta-btn" onClick={onGetStarted} id="cta-get-started">

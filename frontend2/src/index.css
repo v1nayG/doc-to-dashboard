@@ -3,24 +3,24 @@
 /* ─── Design Tokens ──────────────────────────────────────────────────── */
 :root {
   /* Surfaces */
-  --bg-base:        #0d0d0d;
-  --bg-surface:     rgba(24, 24, 24, 0.6);
-  --bg-elevated:    rgba(34, 34, 34, 0.6);
-  --bg-hover:       rgba(44, 44, 44, 0.6);
+  --bg-base:        #FFFFFF;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #F8F9FA;
+  --bg-hover:       #F1F3F4;
 
   /* Borders */
-  --border:         #242424;
-  --border-strong:  #2e2e2e;
+  --border:         #DADCE0;
+  --border-strong:  #BDC1C6;
 
-  /* Primary accent — premium indigo */
-  --accent:         #4f46e5;
-  --accent-dim:     rgba(79, 70, 229, 0.12);
-  --accent-hover:   #3730a3;
+  /* Primary accent — Google Blue */
+  --accent:         #1A73E8;
+  --accent-dim:     rgba(26, 115, 232, 0.12);
+  --accent-hover:   #174EA6;
 
   /* Text */
-  --text-primary:   #e8e8e8;
-  --text-secondary: #808080;
-  --text-muted:     #505050;
+  --text-primary:   #202124;
+  --text-secondary: #5F6368;
+  --text-muted:     #80868B;
 
   /* Status */
   --green:          #22c55e;
@@ -41,8 +41,8 @@
   --transition: all 0.18s var(--ease);
 
   /* Shadow */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
+  --shadow-sm:  0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+  --shadow-md:  0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
 }
 
 /* ─── Reset ──────────────────────────────────────────────────────────── */
@@ -72,8 +72,6 @@ body {
   height: 52px;
   padding: 0 1.5rem;
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -129,8 +127,6 @@ body {
   width: 256px;
   flex-shrink: 0;
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -291,8 +287,6 @@ body {
   cursor: pointer;
   transition: var(--transition);
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 .upload-zone:hover,
 .upload-zone.dragging {
@@ -379,8 +373,6 @@ body {
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 .feature-item {
   display: flex;
@@ -548,8 +540,6 @@ body {
 /* ─── Summary Card ───────────────────────────────────────────────────── */
 .summary-card {
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.5rem;
@@ -574,14 +564,12 @@ body {
 }
 .kpi-card {
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   padding: 1.25rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: inset 0 0 0 1px transparent;
 }
 .kpi-card:hover { 
-  background: rgba(50, 50, 50, 0.5); 
+  background: var(--bg-hover); 
   box-shadow: inset 0 0 0 1px var(--border-strong);
 }
 .kpi-label {
@@ -624,17 +612,15 @@ body {
 @media (max-width: 960px) { .charts-grid { grid-template-columns: 1fr; } }
 .chart-card {
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.5rem 1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 .chart-card:hover { 
   border-color: var(--border-strong); 
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
 }
 .chart-header {
   display: flex;
@@ -689,13 +675,11 @@ body {
 .tables-section { margin-bottom: 2rem; }
 .table-wrapper {
   background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
   margin-bottom: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 .table-heading {
   padding: 0.875rem 1.25rem;
