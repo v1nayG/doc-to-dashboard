@@ -3,28 +3,41 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Save, X, RefreshCw } from 'lucide-react';
 
 const DataEditor = ({ data, onSave, onClose }) => {
-    const [editedData, setEditedData] = useState('');
+    const [editedData, setEditedData] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Format JSON nicely with 2 spaces
-        setEditedData(JSON.stringify(data, null, 2));
+        // Deep copy to avoid mutating original props
+        setEditedData(JSON.parse(JSON.stringify(data)));
     }, [data]);
 
     const handleSave = () => {
         try {
             setError(null);
-            const parsed = JSON.parse(editedData);
-            onSave(parsed);
+            onSave(editedData);
         } catch (err) {
-            setError('Invalid JSON format. Please fix any syntax errors before saving.');
+            setError('An error occurred while saving.');
         }
     };
 
     const handleReset = () => {
-        setEditedData(JSON.stringify(data, null, 2));
+        setEditedData(JSON.parse(JSON.stringify(data)));
         setError(null);
     };
+
+    const handleCellChange = (tableIndex, rowIndex, cellIndex, newValue) => {
+        const newData = { ...editedData };
+        newData.tables[tableIndex].rows[rowIndex][cellIndex] = newValue;
+        setEditedData(newData);
+    };
+
+    const handleHeaderChange = (tableIndex, headerIndex, newValue) => {
+        const newData = { ...editedData };
+        newData.tables[tableIndex].headers[headerIndex] = newValue;
+        setEditedData(newData);
+    };
+
+    if (!editedData) return null;
 
     return (
         <AnimatePresence>
@@ -36,7 +49,7 @@ const DataEditor = ({ data, onSave, onClose }) => {
             >
                 <motion.div 
                     className="auth-card" 
-                    style={{ maxWidth: '800px', width: '90%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: '1.5rem' }}
+                    style={{ maxWidth: '900px', width: '90%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: '1.5rem', overflow: 'hidden' }}
                     initial={{ y: 30, scale: 0.95 }}
                     animate={{ y: 0, scale: 1 }}
                     exit={{ y: 30, scale: 0.95 }}
@@ -45,9 +58,9 @@ const DataEditor = ({ data, onSave, onClose }) => {
                         <div className="dashboard-title-area">
                             <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <Settings size={20} className="text-accent" />
-                                Edit Dashboard Data
+                                Data Editor
                             </h2>
-                            <p>Manually correct any mistakes made by the AI extraction.</p>
+                            <p>Edit your extracted data directly in this spreadsheet.</p>
                         </div>
                         <button onClick={onClose} className="btn btn-ghost" style={{ padding: '6px' }}>
                             <X size={20} />
@@ -60,36 +73,58 @@ const DataEditor = ({ data, onSave, onClose }) => {
                         </div>
                     )}
 
-                    <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                        <textarea
-                            value={editedData}
-                            onChange={(e) => setEditedData(e.target.value)}
-                            style={{
-                                flex: 1,
-                                width: '100%',
-                                backgroundColor: 'var(--bg-base)',
-                                color: 'var(--text-primary)',
-                                border: '1px solid var(--border)',
-                                borderRadius: 'var(--radius-md)',
-                                padding: '1rem',
-                                fontFamily: 'monospace',
-                                fontSize: '0.85rem',
-                                resize: 'none',
-                                outline: 'none',
-                                whiteSpace: 'pre',
-                                overflowWrap: 'normal',
-                                overflowX: 'auto',
-                            }}
-                            spellCheck="false"
-                        />
+                    <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        {(!editedData.tables || editedData.tables.length === 0) ? (
+                            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                <p>No table data extracted. Please upload a document containing structured data.</p>
+                            </div>
+                        ) : (
+                            editedData.tables.map((table, tIndex) => (
+                                <div key={tIndex} className="editor-table-wrapper">
+                                    {table.title && <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{table.title}</h3>}
+                                    <div className="editor-table-container">
+                                        <table className="editor-table">
+                                            <thead>
+                                                <tr>
+                                                    {table.headers.map((h, hIndex) => (
+                                                        <th key={hIndex}>
+                                                            <input 
+                                                                className="editor-input editor-header-input"
+                                                                value={h}
+                                                                onChange={(e) => handleHeaderChange(tIndex, hIndex, e.target.value)}
+                                                            />
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {table.rows.map((row, rIndex) => (
+                                                    <tr key={rIndex}>
+                                                        {row.map((cell, cIndex) => (
+                                                            <td key={cIndex}>
+                                                                <input 
+                                                                    className="editor-input"
+                                                                    value={cell}
+                                                                    onChange={(e) => handleCellChange(tIndex, rIndex, cIndex, e.target.value)}
+                                                                />
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
                         <button onClick={handleReset} className="btn btn-ghost">
                             <RefreshCw size={16} /> Reset
                         </button>
                         <button onClick={handleSave} className="btn btn-primary">
-                            <Save size={16} /> Save & Update Charts
+                            <Save size={16} /> Save Changes
                         </button>
                     </div>
                 </motion.div>
