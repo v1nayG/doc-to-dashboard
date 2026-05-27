@@ -37,10 +37,34 @@ export default function App() {
   const [page, setPage] = useState(PAGE.LANDING)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
+  // Navigate with browser history support
+  const navigate = (nextPage) => {
+    // always unlock scroll when leaving auth page
+    document.body.style.overflow = ''
+    window.scrollTo(0, 0)
+    window.history.pushState({ page: nextPage }, '', window.location.pathname)
+    setPage(nextPage)
+  }
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    // Seed the initial history state so back works from any page
+    window.history.replaceState({ page: PAGE.LANDING }, '', window.location.pathname)
+
+    const onPop = (e) => {
+      const target = e.state?.page || PAGE.LANDING
+      document.body.style.overflow = ''
+      window.scrollTo(0, 0)
+      setPage(target)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
   // Once auth resolves: if user is logged in, go straight to app
   useEffect(() => {
     if (!authLoading && user) {
-      setPage(PAGE.APP)
+      navigate(PAGE.APP)
     }
   }, [authLoading, user])
 
@@ -113,7 +137,7 @@ export default function App() {
     setDashboardData(null)
     setHistory([])
     setActiveId(null)
-    setPage(PAGE.LANDING)
+    navigate(PAGE.LANDING)
   }
 
   // Auth loading spinner
@@ -137,9 +161,9 @@ export default function App() {
       <LandingPage
         onGetStarted={() => {
           if (user) {
-            setPage(PAGE.APP)
+            navigate(PAGE.APP)
           } else {
-            setPage(PAGE.AUTH)
+            navigate(PAGE.AUTH)
           }
         }}
       />
@@ -150,8 +174,8 @@ export default function App() {
   if (page === PAGE.AUTH || (!user && page !== PAGE.LANDING)) {
     return (
       <AuthPage
-        onSuccess={() => setPage(PAGE.APP)}
-        onBack={() => setPage(PAGE.LANDING)}
+        onSuccess={() => navigate(PAGE.APP)}
+        onBack={() => navigate(PAGE.LANDING)}
       />
     )
   }
@@ -210,27 +234,65 @@ export default function App() {
 
           {!dashboardData ? (
             <>
-              {/* Hero */}
-              <div className="landing-hero" style={{ minHeight: 'auto', padding: '40px 2rem 60px', background: 'transparent' }}>
-                <div className="hero-blob hero-blob-1" style={{ top: '-100px', right: '-50px', width: '400px', height: '400px' }} />
-                <div className="hero-blob hero-blob-2" style={{ bottom: '-50px', left: '-50px', width: '300px', height: '300px' }} />
-
-                <motion.div className="hero-content" style={{ margin: '0 auto' }}>
-                  <motion.div className="hero-badge" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-                    <span className="hero-badge-dot" />
-                    AI-Powered · Document Intelligence
-                  </motion.div>
-
-                  <motion.h1 className="hero-title" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '1rem' }} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.8 }}>
-                    Turn documents into <br />
-                    <span className="hero-title-accent">live dashboards</span>
-                  </motion.h1>
-
-                  <motion.p className="hero-desc" style={{ marginBottom: '2rem' }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }}>
-                    Upload a PDF, spreadsheet, or image. Gemini AI extracts
-                    structured data and builds an interactive dashboard instantly.
-                  </motion.p>
+              {/* Upload Hero */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                padding: '48px 2rem 32px',
+                fontFamily: "'Inter', sans-serif",
+              }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    background: 'rgba(176,64,144,0.1)',
+                    border: '1px solid rgba(176,64,144,0.25)',
+                    color: '#c8a0e0',
+                    padding: '5px 16px', borderRadius: 999,
+                    fontSize: '0.78rem', fontWeight: 600,
+                    letterSpacing: '0.06em', textTransform: 'uppercase',
+                    marginBottom: '1.5rem',
+                  }}
+                >
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8a0e0', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+                  AI-Powered · Document Intelligence
                 </motion.div>
+
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.7 }}
+                  style={{
+                    fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+                    fontWeight: 300,
+                    lineHeight: 1.1,
+                    letterSpacing: '-0.03em',
+                    color: '#f0f0f5',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  Turn documents into{' '}
+                  <strong style={{
+                    fontWeight: 400, display: 'block',
+                    background: 'linear-gradient(to right, #ffffff, #c8a0e0)',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  }}>
+                    live dashboards
+                  </strong>
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', maxWidth: 440, lineHeight: 1.7, marginBottom: '2rem' }}
+                >
+                  Upload a PDF, spreadsheet, or image. Gemini AI extracts structured data and builds an interactive dashboard instantly.
+                </motion.p>
               </div>
 
               {/* Error */}
