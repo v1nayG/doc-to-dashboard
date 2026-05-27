@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Download, ChevronDown, Image as ImageIcon, FileJson, FileSpreadsheet } from 'lucide-react'
 import KPICard from './KPICard'
 import ChartCard from './ChartCard'
 import DataEditor from './DataEditor'
@@ -8,11 +9,22 @@ import html2canvas from 'html2canvas'
 export default function Dashboard({ data, onReset }) {
   const [exporting, setExporting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [currentData, setCurrentData] = useState(data)
 
   useEffect(() => {
     setCurrentData(data)
   }, [data])
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.dropdown-container')) {
+        setExportMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleExportPNG = async () => {
     setExporting(true)
@@ -107,20 +119,52 @@ export default function Dashboard({ data, onReset }) {
           <button className="btn btn-ghost" onClick={() => setIsEditing(true)}>
             Edit Data
           </button>
-          <div style={{ display: 'flex', gap: '4px' }}>
-            <button className="btn btn-ghost" onClick={handleExportJSON} style={{ padding: '8px 10px' }}>
-              JSON
+          
+          <div className="dropdown-container">
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setExportMenuOpen(!exportMenuOpen)}
+              disabled={exporting}
+            >
+              <Download size={15} strokeWidth={2} />
+              {exporting ? 'Exporting…' : 'Export'}
+              <ChevronDown 
+                size={14} 
+                strokeWidth={2} 
+                style={{ 
+                  marginLeft: '4px', opacity: 0.7, 
+                  transform: exportMenuOpen ? 'rotate(180deg)' : 'none', 
+                  transition: 'transform 0.2s' 
+                }} 
+              />
             </button>
-            <button className="btn btn-ghost" onClick={handleExportCSV} style={{ padding: '8px 10px' }}>
-              CSV
-            </button>
+            
+            <AnimatePresence>
+              {exportMenuOpen && (
+                <motion.div 
+                  className="dropdown-menu"
+                  initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <button className="dropdown-item" onClick={() => { handleExportPNG(); setExportMenuOpen(false); }}>
+                    <ImageIcon size={14} strokeWidth={2} />
+                    Download PNG Image
+                  </button>
+                  <button className="dropdown-item" onClick={() => { handleExportCSV(); setExportMenuOpen(false); }}>
+                    <FileSpreadsheet size={14} strokeWidth={2} />
+                    Download CSV Tables
+                  </button>
+                  <button className="dropdown-item" onClick={() => { handleExportJSON(); setExportMenuOpen(false); }}>
+                    <FileJson size={14} strokeWidth={2} />
+                    Download JSON Data
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <button className="btn btn-primary" onClick={handleExportPNG} disabled={exporting}>
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M8 2v9M4 8l4 4 4-4"/><line x1="2" y1="14" x2="14" y2="14"/>
-            </svg>
-            {exporting ? 'Exporting…' : 'Export PNG'}
-          </button>
+
           <button className="btn btn-ghost" onClick={onReset} style={{ marginLeft: '8px' }}>
             New
           </button>

@@ -1,5 +1,6 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { User, LogOut, Settings, ChevronDown } from 'lucide-react'
 import axios from 'axios'
 import UploadZone from './components/UploadZone'
 import Dashboard from './components/Dashboard'
@@ -36,6 +37,18 @@ export default function App() {
   const [activeId, setActiveId] = useState(null)
   const [page, setPage] = useState(PAGE.LANDING)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Navigate with browser history support
   const navigate = (nextPage) => {
@@ -206,12 +219,56 @@ export default function App() {
             <span className="nav-pill-dot" />
             Powered by Gemini
           </span>
-          <span className="nav-user-pill">
-            {user?.username || user?.email?.split('@')[0] || 'User'}
-          </span>
-          <button onClick={handleLogout} className="btn btn-ghost" style={{ padding: '4px 10px', fontSize: '0.72rem' }}>
-            Logout
-          </button>
+          
+          <div className="dropdown-container" ref={userMenuRef}>
+            <button 
+              className="btn btn-ghost" 
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--border-strong)', borderRadius: '20px' }}
+            >
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }}>
+                {(user?.username || user?.email || 'U')[0].toUpperCase()}
+              </div>
+              <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-primary)' }}>
+                {user?.username || user?.email?.split('@')[0] || 'User'}
+              </span>
+              <ChevronDown size={14} style={{ opacity: 0.5, transform: userMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </button>
+
+            <AnimatePresence>
+              {userMenuOpen && (
+                <motion.div 
+                  className="dropdown-menu"
+                  initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  style={{ minWidth: 200, padding: '8px' }}
+                >
+                  <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{user?.username || 'User Account'}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
+                  </div>
+                  
+                  <button className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                    <User size={14} />
+                    Profile Settings
+                  </button>
+                  <button className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                    <Settings size={14} />
+                    Preferences
+                  </button>
+                  
+                  <div style={{ height: 1, background: 'var(--border)', margin: '4px 0' }} />
+                  
+                  <button className="dropdown-item" onClick={handleLogout} style={{ color: 'var(--red)' }}>
+                    <LogOut size={14} />
+                    Sign Out
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </nav>
 
