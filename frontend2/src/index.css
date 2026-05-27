@@ -512,37 +512,144 @@ body {
 .dropdown-menu {
   position: absolute;
   top: 100%; right: 0;
-  margin-top: 6px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  padding: 6px;
-  min-width: 160px;
+  margin-top: 8px;
+  background: rgba(18, 18, 24, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 180px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  box-shadow: var(--shadow-md);
+  gap: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
   z-index: 1000;
 }
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 10px;
+  padding: 10px 12px;
   border: none;
   background: transparent;
-  color: var(--text-primary);
-  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dropdown-item svg { 
+  opacity: 0.6; 
+  transition: all 0.2s ease;
+}
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+.dropdown-item:hover svg { 
+  opacity: 1; 
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+/* ─── Data Editor ────────────────────────────────────────────────────── */
+.editor-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+.editor-sidebar {
+  width: 200px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1rem 1rem 0;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.editor-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
   text-align: left;
   transition: var(--transition);
 }
-.dropdown-item:hover {
+.editor-tab:hover {
   background: var(--bg-hover);
+  color: var(--text-primary);
 }
-.dropdown-item svg { opacity: 0.7; }
+.editor-tab.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+.editor-content {
+  flex: 1;
+  padding: 1.5rem 0 1rem 1.5rem;
+  overflow-y: auto;
+}
+.editor-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+.input-group {
+  margin-bottom: 1.25rem;
+}
+.input-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.input-field {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: var(--transition);
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+textarea.input-field {
+  resize: vertical;
+  min-height: 80px;
+}
+.kpi-editor-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.kpi-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
 
 /* ─── Buttons ────────────────────────────────────────────────────────── */
 .btn {
