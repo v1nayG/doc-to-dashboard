@@ -8,6 +8,7 @@ import Loader from './components/Loader'
 import Sidebar from './components/Sidebar'
 import AuthPage from './pages/AuthPage'
 import LandingPage from './pages/LandingPage'
+import UserProfile from './pages/UserProfile'
 import AuthContext from './context/AuthContext'
 import './index.css'
 
@@ -26,6 +27,7 @@ const PAGE = {
   LANDING: 'landing',
   AUTH: 'auth',
   APP: 'app',
+  PROFILE: 'profile',
 }
 
 export default function App() {
@@ -168,6 +170,13 @@ export default function App() {
     )
   }
 
+  // ── User Profile Page ───────────────────────
+  if (page === PAGE.PROFILE && user) {
+    return (
+      <UserProfile user={user} onBack={() => navigate(PAGE.APP)} />
+    )
+  }
+
   // ── Landing Page ────────────────────────────
   if (page === PAGE.LANDING) {
     return (
@@ -250,13 +259,9 @@ export default function App() {
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</div>
                   </div>
                   
-                  <button className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                  <button className="dropdown-item" onClick={() => { setUserMenuOpen(false); navigate(PAGE.PROFILE); }}>
                     <User size={14} />
                     Profile Settings
-                  </button>
-                  <button className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
-                    <Settings size={14} />
-                    Preferences
                   </button>
                   
                   <div style={{ height: 1, background: 'var(--border)', margin: '4px 0' }} />

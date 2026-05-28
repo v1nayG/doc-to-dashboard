@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, ChevronDown, Image as ImageIcon, FileJson, FileSpreadsheet } from 'lucide-react'
+import { Download, ChevronDown, Image as ImageIcon, FileJson, FileSpreadsheet, FileText } from 'lucide-react'
+import jsPDF from 'jspdf'
 import KPICard from './KPICard'
 import ChartCard from './ChartCard'
 import DataEditor from './DataEditor'
@@ -29,20 +30,58 @@ export default function Dashboard({ data, onReset }) {
   const handleExportPNG = async () => {
     setExporting(true)
     try {
-      const el = document.getElementById('dashboard-content')
-      const canvas = await html2canvas(el, {
-        backgroundColor: '#141414',
+      const dashboardElement = document.getElementById('dashboard-content')
+      if (!dashboardElement) return
+
+      const canvas = await html2canvas(dashboardElement, {
         scale: 2,
         useCORS: true,
+        backgroundColor: '#0d0d0d'
       })
+
+      const image = canvas.toDataURL('image/png')
       const link = document.createElement('a')
-      link.download = `${currentData.title || 'dashboard'}.png`
-      link.href = canvas.toDataURL('image/png')
+      link.href = image
+      link.download = 'dashboard.png'
       link.click()
     } catch (err) {
-      console.error('Export failed:', err)
+      console.error('Failed to export PNG', err)
+      alert('Failed to export PNG. Please try again.')
+    } finally {
+      setExporting(false)
     }
-    setExporting(false)
+  }
+
+  const handleExportPDF = async () => {
+    setExporting(true)
+    try {
+      const dashboardElement = document.getElementById('dashboard-content')
+      if (!dashboardElement) return
+
+      const canvas = await html2canvas(dashboardElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0d0d0d'
+      })
+
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      })
+
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+      pdf.save('dashboard-report.pdf')
+    } catch (err) {
+      console.error('Failed to export PDF', err)
+      alert('Failed to export PDF. Please try again.')
+    } finally {
+      setExporting(false)
+    }
   }
 
   const handleExportJSON = () => {
@@ -148,6 +187,10 @@ export default function Dashboard({ data, onReset }) {
                   exit={{ opacity: 0, y: -5, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
                 >
+                  <button className="dropdown-item" onClick={() => { handleExportPDF(); setExportMenuOpen(false); }}>
+                    <FileText size={14} strokeWidth={2} />
+                    Download PDF Report
+                  </button>
                   <button className="dropdown-item" onClick={() => { handleExportPNG(); setExportMenuOpen(false); }}>
                     <ImageIcon size={14} strokeWidth={2} />
                     Download PNG Image

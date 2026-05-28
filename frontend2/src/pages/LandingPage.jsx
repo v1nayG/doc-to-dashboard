@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Monitor, Palette, Zap, Cpu, ScanText, Files, History, BarChart3, Brain, FileText, LayoutDashboard } from 'lucide-react';
 import '../landing.css';
 import '../xero.css';

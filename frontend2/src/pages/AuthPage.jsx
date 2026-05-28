@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import AuthContext from '../context/AuthContext';
 import '../auth-aurora.css';
 
