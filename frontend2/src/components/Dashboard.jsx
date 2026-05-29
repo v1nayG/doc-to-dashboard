@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, ChevronDown, Image as ImageIcon, FileJson, FileSpreadsheet, FileText } from 'lucide-react'
+import { Download, ChevronDown, Image as ImageIcon, FileJson, FileSpreadsheet, FileText, Edit3 } from 'lucide-react'
 import jsPDF from 'jspdf'
 import KPICard from './KPICard'
 import ChartCard from './ChartCard'
 import DataEditor from './DataEditor'
 import html2canvas from 'html2canvas'
 
-export default function Dashboard({ data, onReset }) {
+export default function Dashboard({ data, onReset, onUpdateDocument }) {
   const [exporting, setExporting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
@@ -121,8 +121,12 @@ export default function Dashboard({ data, onReset }) {
   }
 
   const handleSaveEdit = (newData) => {
-    setCurrentData(newData);
+    const updated = { ...newData, isEdited: true };
+    setCurrentData(updated);
     setIsEditing(false);
+    if (onUpdateDocument) {
+      onUpdateDocument(updated);
+    }
   }
 
   const kpis   = currentData.kpis   || []
@@ -146,10 +150,18 @@ export default function Dashboard({ data, onReset }) {
       {/* Header */}
       <div className="dashboard-header">
         <div className="dashboard-title-area">
-          {currentData.document_type && (
-            <div className="doc-badge">{currentData.document_type}</div>
-          )}
-          <h2>{currentData.title || 'Generated Dashboard'}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            {currentData.document_type && (
+              <div className="doc-badge">{currentData.document_type}</div>
+            )}
+            {currentData.isEdited && (
+              <div className="edited-badge" title="Manually edited for accuracy">
+                <Edit3 size={12} style={{ marginRight: '4px' }} />
+                EDITED MANUALLY
+              </div>
+            )}
+          </div>
+          <h2 style={{ marginTop: 0 }}>{currentData.title || 'Generated Dashboard'}</h2>
           {currentData.fileName && (
             <p>{currentData.fileName}</p>
           )}

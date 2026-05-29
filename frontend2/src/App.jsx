@@ -106,8 +106,11 @@ export default function App() {
         timeout: 120000,
       })
       if (res.data.success) {
-        setDashboardData(res.data.data)
-        setActiveId(res.data.data._id || null)
+        const d = res.data.data;
+        const docId = d._id ? d._id.toString() : null;
+        setDashboardData(d)
+        setActiveId(docId)
+        console.log('[upload] activeId set to:', docId);
         fetchHistory()
       }
     } catch (err) {
@@ -119,11 +122,13 @@ export default function App() {
   }
 
   const handleSelectHistory = async (doc) => {
-    setActiveId(doc._id || null)
+    const docId = doc._id ? doc._id.toString() : null;
+    setActiveId(docId)
+    console.log('[history] activeId set to:', docId);
     setIsLoading(true)
     setError(null)
     try {
-      const res = await axios.get(`${API_BASE}/history/${doc._id}`)
+      const res = await axios.get(`${API_BASE}/history/${docId}`)
       setDashboardData(res.data.data)
     } catch (err) {
       console.error(err)
@@ -139,6 +144,35 @@ export default function App() {
       setHistory(prev => prev.filter(d => d._id !== id))
       if (activeId === id) { setDashboardData(null); setActiveId(null) }
     } catch (_) {}
+  }
+
+  const handleUpdateDocument = async (newData) => {
+    // Read _id directly from the data — most reliable source
+    const idToUse = newData._id
+      ? newData._id.toString()
+      : activeId
+        ? activeId.toString()
+        : null;
+
+    if (!idToUse) {
+      alert('SAVE FAILED: Could not find document ID. Please reload the document from the sidebar and try again.');
+      return;
+    }
+
+    try {
+      const res = await axios.put(`${API_BASE}/history/${idToUse}`, { dashboardData: newData });
+      if (res.data.success) {
+        setDashboardData(newData);
+        setActiveId(idToUse);
+        alert('✅ Saved to database! Refresh the page to verify.');
+      } else {
+        alert('SAVE FAILED: ' + JSON.stringify(res.data));
+      }
+    } catch (err) {
+      const msg = err.response?.data?.error || err.message;
+      alert('SAVE ERROR: ' + msg);
+      console.error(err);
+    }
   }
 
   const handleReset = () => {
@@ -220,7 +254,7 @@ export default function App() {
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-          <div className="logo-mark"><LogoIcon /></div>
+          <img src="/logo.png" alt="DocDash" style={{ width: 26, height: 26, borderRadius: 7, objectFit: 'cover' }} />
           DocDash
         </div>
         <div className="navbar-right">
@@ -387,7 +421,7 @@ export default function App() {
               </div>
             </>
           ) : (
-            <Dashboard data={dashboardData} onReset={handleReset} />
+            <Dashboard data={dashboardData} onReset={handleReset} onUpdateDocument={handleUpdateDocument} />
           )}
         </div>
       </div>

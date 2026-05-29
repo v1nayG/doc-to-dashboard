@@ -136,11 +136,7 @@ export default function LandingPage({ onGetStarted }) {
       <div className="xero-hero-wrapper">
         <nav className="xero-nav">
           <span className="nav-logo">
-            <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-              <rect x="1" y="9" width="3" height="6" rx="1" fill="white"/>
-              <rect x="6" y="5" width="3" height="10" rx="1" fill="white" opacity="0.8"/>
-              <rect x="11" y="1" width="3" height="14" rx="1" fill="white" opacity="0.6"/>
-            </svg>
+            <img src="/logo.png" alt="DocDash" style={{ width: 22, height: 22, borderRadius: 6, objectFit: 'cover', verticalAlign: 'middle' }} />
             DocDash
           </span>
           <button className={`menu-toggle ${menuOpen ? 'active' : ''}`} onClick={toggleMenu}>
@@ -183,28 +179,33 @@ export default function LandingPage({ onGetStarted }) {
             </svg>
 
             <div className="icon-node node-light-right" id="node-stack" ref={nodeStackRef}>
-              <svg viewBox="0 0 24 24">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-                <polyline points="2 17 12 22 22 17"/>
-                <polyline points="2 12 12 17 22 12"/>
+              {/* Document icon */}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+                <line x1="9" y1="17" x2="13" y2="17"/>
               </svg>
             </div>
             <div className="pipeline-line"/>
             <div className="center-wrapper">
               <div className="splash" ref={splashRef}/>
               <div className="icon-node-center" id="node-x" ref={nodeXRef}>
-                <svg width="28" height="28" viewBox="0 0 16 16" fill="none">
-                  <rect x="1" y="9" width="3" height="6" rx="1" fill="white"/>
-                  <rect x="6" y="5" width="3" height="10" rx="1" fill="white" opacity="0.8"/>
-                  <rect x="11" y="1" width="3" height="14" rx="1" fill="white" opacity="0.6"/>
+                {/* AI Processing icon — CPU */}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="7" y="7" width="10" height="10" rx="1"/>
+                  <path d="M9 7V4M12 7V4M15 7V4M9 17v3M12 17v3M15 17v3M7 9H4M7 12H4M7 15H4M17 9h3M17 12h3M17 15h3"/>
                 </svg>
               </div>
             </div>
             <div className="pipeline-line right"/>
             <div className="icon-node node-light-left" id="node-shield" ref={nodeShieldRef}>
-              <svg viewBox="0 0 24 24">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <polyline points="9 12 11 14 15 10"/>
+              {/* Dashboard — bar chart icon */}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+                <line x1="2" y1="20" x2="22" y2="20"/>
               </svg>
             </div>
           </div>
@@ -420,19 +421,64 @@ export default function LandingPage({ onGetStarted }) {
 
       {/* ══ FOOTER ════════════════════════════════════════════════ */}
       <footer className="landing-footer">
-        <div className="landing-nav-logo">
-          <div className="landing-logo-mark">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <rect x="1" y="9" width="3" height="6" rx="1" fill="white"/>
-              <rect x="6" y="5" width="3" height="10" rx="1" fill="white" opacity="0.8"/>
-              <rect x="11" y="1" width="3" height="14" rx="1" fill="white" opacity="0.6"/>
-            </svg>
+        <div className="footer-top">
+          {/* Brand col */}
+          <div className="footer-brand-col">
+            <div className="landing-nav-logo" style={{ marginBottom: '0.75rem' }}>
+              <img src="/logo.png" alt="DocDash Logo" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} />
+              <span className="landing-brand">DocDash</span>
+            </div>
+            <p className="footer-tagline">
+              Intelligence extracted.<br/>Decisions accelerated.
+            </p>
+            <div className="footer-ai-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+              </svg>
+              Inference by Groq · Models by Google DeepMind
+            </div>
           </div>
-          <span className="landing-brand">DocDash</span>
+
+          {/* Product col */}
+          <div className="footer-links-col">
+            <div className="footer-col-title">Product</div>
+            <ul className="footer-links">
+              <li><a href="#features">Features</a></li>
+              <li><a href="#how-it-works">How It Works</a></li>
+              <li><a href="#about">About</a></li>
+              <li><span className="footer-badge-soon">Changelog</span></li>
+            </ul>
+          </div>
+
+          {/* Tech Stack col */}
+          <div className="footer-links-col">
+            <div className="footer-col-title">Built With</div>
+            <ul className="footer-links">
+              <li>React + Vite</li>
+              <li>Node.js + Express</li>
+              <li>MongoDB Atlas</li>
+              <li>LLaMA 3.3 70B via Groq</li>
+            </ul>
+          </div>
+
+          {/* Legal col */}
+          <div className="footer-links-col">
+            <div className="footer-col-title">Legal</div>
+            <ul className="footer-links">
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Cookie Policy</a></li>
+            </ul>
+          </div>
         </div>
-        <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.82rem' }}>
-          Powered by Google Gemini AI · Built with ❤️
-        </p>
+
+        <div className="footer-bottom">
+          <span>© {new Date().getFullYear()} DocDash AI · All rights reserved.</span>
+          <span className="footer-divider">·</span>
+          <span>Built at REVA University, Bengaluru 🇮🇳</span>
+          <span className="footer-divider">·</span>
+          <span>AI outputs may vary. Always verify critical data.</span>
+        </div>
       </footer>
     </div>
   );

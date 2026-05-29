@@ -44,8 +44,41 @@ const deleteDocument = async (req, res) => {
     }
 };
 
+// PUT /api/history/:id — update a document's dashboard data (manual edits)
+const updateDocument = async (req, res) => {
+    console.log(`[PUT] /api/history/${req.params.id} called`);
+    if (!isConnected()) return res.status(503).json({ error: 'Database not connected' });
+
+    try {
+        const { dashboardData } = req.body;
+        if (!dashboardData) {
+            console.log('No dashboardData in body');
+            return res.status(400).json({ error: 'Missing dashboardData' });
+        }
+        
+        console.log(`Updating document ${req.params.id} with isEdited=${dashboardData.isEdited}`);
+
+        const doc = await Document.findOneAndUpdate(
+            { _id: req.params.id, user: req.user._id },
+            { $set: { dashboardData: dashboardData } },
+            { new: true }
+        );
+
+        if (!doc) {
+            console.log('Document not found for update');
+            return res.status(404).json({ error: 'Document not found or unauthorized' });
+        }
+        console.log('Update successful');
+        res.json({ success: true, data: doc.dashboardData });
+    } catch (err) {
+        console.log('Update error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+};
+
 module.exports = {
     getHistory,
     getDocument,
-    deleteDocument
+    deleteDocument,
+    updateDocument
 };
