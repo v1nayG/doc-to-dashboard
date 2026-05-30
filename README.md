@@ -134,5 +134,5 @@ PORT=5000
 
 ---
 
-*Built as an AI Application subject project — REVA University CSE*
+*Developed by [@v1nayG](https://github.com/v1nayG) as an AI Application subject project — REVA University CSE*
        
