@@ -78,7 +78,7 @@ npm start
 
 ### 2. Frontend Setup
 ```bash
-cd frontend2
+cd Frontend
 npm install
 npm run dev
 ```
@@ -108,7 +108,7 @@ doc-to-dashboard/
 │   └── models/
 │       ├── User.js                # Mongoose Schema for accounts
 │       └── Document.js            # Mongoose Schema for dashboard histories
-└── frontend2/
+└── Frontend/
     ├── public/
     │   └── logo.png               # Custom branding logo asset
     └── src/
