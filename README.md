@@ -131,8 +131,3 @@ MONGODB_URI=your_mongodb_atlas_uri_here
 JWT_SECRET=your_secure_random_string
 PORT=5000
 ```
-
----
-
-*Developed by [@v1nayG](https://github.com/v1nayG) as an AI Application subject project — REVA University CSE*
-       
