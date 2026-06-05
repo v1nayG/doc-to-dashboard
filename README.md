@@ -7,6 +7,8 @@
 [![LLaMA 3](https://img.shields.io/badge/AI-LLaMA%203.3%2070B-orange)](https://groq.com)
 [![MongoDB](https://img.shields.io/badge/DB-MongoDB%20Atlas-green)](https://mongodb.com)
 
+🔗 **Live Demo:** [doc-to-dashboard.vercel.app](https://doc-to-dashboard.vercel.app)
+
 ---
 
 ## 🎯 The Problem Solved
