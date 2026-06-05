@@ -12,7 +12,7 @@ import UserProfile from './pages/UserProfile'
 import AuthContext from './context/AuthContext'
 import './index.css'
 
-const API_BASE = 'http://localhost:5000/api'
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 const LogoIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
