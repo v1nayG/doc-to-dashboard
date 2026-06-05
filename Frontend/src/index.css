@@ -720,10 +720,8 @@ textarea.input-field {
 
 /* ─── Summary Card ───────────────────────────────────────────────────── */
 .summary-card {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: #16161c;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
   padding: 1.5rem 1.75rem;
   margin-bottom: 2.5rem;
@@ -759,10 +757,8 @@ textarea.input-field {
   overflow: visible;
 }
 .kpi-card {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: #16161c;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -828,10 +824,8 @@ textarea.input-field {
 }
 @media (max-width: 960px) { .charts-grid { grid-template-columns: 1fr; } }
 .chart-card {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: #16161c;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
   padding: 1.5rem 1.75rem 1.25rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -916,10 +910,8 @@ textarea.input-field {
 /* ─── Data Tables ────────────────────────────────────────────────────── */
 .tables-section { margin-bottom: 2rem; }
 .table-wrapper {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: #16161c;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
   overflow: hidden;
   margin-bottom: 1.5rem;
