@@ -432,6 +432,60 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+.loader-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+.loader-sublabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+.loader-steps {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.loader-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+.loader-step.done {
+  color: var(--green);
+}
+.loader-step.active {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+.step-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.loader-step.done .step-dot {
+  background: var(--green);
+}
+.loader-step.active .step-dot {
+  background: var(--accent);
+  animation: pulse 1s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
 /* ─── Dashboard Backdrop & Wrapper ───────────────────────────────────── */
 .dashboard-wrapper {
   position: relative;
