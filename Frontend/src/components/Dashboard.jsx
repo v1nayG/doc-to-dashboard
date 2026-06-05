@@ -226,7 +226,7 @@ export default function Dashboard({ data, onReset, onUpdateDocument }) {
         </div>
       </div>
 
-      <div id="dashboard-content">
+      <div className="dashboard-wrapper" id="dashboard-content">
         {/* Summary */}
         {currentData.summary && (
           <motion.div

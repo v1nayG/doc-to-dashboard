@@ -13,8 +13,14 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="custom-tooltip">
         {label && <div className="custom-tooltip-label">{label}</div>}
         {payload.map((p, i) => (
-          <div key={i} className="custom-tooltip-value" style={{ color: p.color || 'var(--text-primary)' }}>
-            {p.name ? `${p.name}: ` : ''}{typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
+          <div key={i} className="custom-tooltip-row" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: i > 0 ? '4px' : '0' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: p.color || p.payload?.fill || 'var(--accent)', display: 'inline-block' }} />
+            <div className="custom-tooltip-value" style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+              {p.name ? `${p.name}: ` : ''}
+              <strong style={{ color: 'var(--text-primary)', marginLeft: '4px' }}>
+                {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
+              </strong>
+            </div>
           </div>
         ))}
       </div>
@@ -50,26 +56,30 @@ export default function ChartCard({ chart, index }) {
       case 'bar':
         return (
           <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+            <defs>
+              <linearGradient id={`bar_${index}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={lineColor} stopOpacity={0.85} />
+                <stop offset="100%" stopColor={lineColor} stopOpacity={0.25} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" stroke={gridColor} vertical={false} />
             <XAxis dataKey="label" stroke={axisColor} tick={AXIS_STYLE} tickLine={false} axisLine={false} />
             <YAxis stroke={axisColor} tick={AXIS_STYLE} tickLine={false} axisLine={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-            <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-              {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-            </Bar>
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)', radius: 4 }} />
+            <Bar dataKey="value" fill={`url(#bar_${index})`} radius={[4, 4, 0, 0]} />
           </BarChart>
         )
       case 'line':
         return (
           <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+            <CartesianGrid strokeDasharray="4 4" stroke={gridColor} vertical={false} />
             <XAxis dataKey="label" stroke={axisColor} tick={AXIS_STYLE} tickLine={false} axisLine={false} />
             <YAxis stroke={axisColor} tick={AXIS_STYLE} tickLine={false} axisLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Line type="monotone" dataKey="value"
-              stroke={lineColor} strokeWidth={2}
-              dot={{ fill: lineColor, r: 3, strokeWidth: 0 }}
-              activeDot={{ r: 5, strokeWidth: 0 }} />
+              stroke={lineColor} strokeWidth={3}
+              dot={{ fill: lineColor, r: 4, strokeWidth: 0 }}
+              activeDot={{ r: 6, strokeWidth: 0, fill: '#fff', stroke: lineColor }} />
           </LineChart>
         )
       case 'area':
@@ -77,16 +87,16 @@ export default function ChartCard({ chart, index }) {
           <AreaChart {...commonProps}>
             <defs>
               <linearGradient id={`ag_${index}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={lineColor} stopOpacity={0.2} />
-                <stop offset="100%" stopColor={lineColor} stopOpacity={0} />
+                <stop offset="0%" stopColor={lineColor} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={lineColor} stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+            <CartesianGrid strokeDasharray="4 4" stroke={gridColor} vertical={false} />
             <XAxis dataKey="label" stroke={axisColor} tick={AXIS_STYLE} tickLine={false} axisLine={false} />
             <YAxis stroke={axisColor} tick={AXIS_STYLE} tickLine={false} axisLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="value"
-              stroke={lineColor} strokeWidth={2}
+              stroke={lineColor} strokeWidth={2.5}
               fill={`url(#ag_${index})`} />
           </AreaChart>
         )
@@ -94,8 +104,10 @@ export default function ChartCard({ chart, index }) {
         return (
           <PieChart>
             <Pie data={data} dataKey="value" nameKey="label"
-              cx="50%" cy="50%" outerRadius={100} innerRadius={36}
-              paddingAngle={2}
+              cx="50%" cy="50%" outerRadius={95} innerRadius={45}
+              paddingAngle={3}
+              stroke="rgba(13, 13, 13, 0.8)"
+              strokeWidth={2}
               label={({ label, percent }) =>
                 percent > 0.05 ? `${label} (${(percent * 100).toFixed(0)}%)` : ''
               }
