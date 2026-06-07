@@ -42,6 +42,11 @@ export default function App() {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
 
+  const [passwordPromptOpen, setPasswordPromptOpen] = useState(false)
+  const [passwordFile, setPasswordFile] = useState(null)
+  const [passwordInput, setPasswordInput] = useState('')
+  const [passwordError, setPasswordError] = useState(null)
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -94,12 +99,17 @@ export default function App() {
     } catch (_) {}
   }
 
-  const handleUpload = async (file) => {
+  const handleUpload = async (file, password = '') => {
     setIsLoading(true)
     setError(null)
     setDashboardData(null)
+
     const formData = new FormData()
     formData.append('document', file)
+    if (password) {
+      formData.append('password', password)
+    }
+
     try {
       const res = await axios.post(`${API_BASE}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -112,13 +122,41 @@ export default function App() {
         setActiveId(docId)
         console.log('[upload] activeId set to:', docId);
         fetchHistory()
+        
+        // Reset password prompt state
+        setPasswordPromptOpen(false)
+        setPasswordFile(null)
+        setPasswordInput('')
+        setPasswordError(null)
+        setIsLoading(false)
       }
     } catch (err) {
-      const msg = err.response?.data?.error || err.message || 'Upload failed. Please try again.'
-      setError(msg)
-    } finally {
       setIsLoading(false)
+      if (err.response?.status === 401 && err.response?.data?.requiresPassword) {
+        setPasswordPromptOpen(true)
+        setPasswordFile(file)
+        setPasswordError(password ? 'Incorrect password. Please try again.' : null)
+      } else {
+        const msg = err.response?.data?.error || err.message || 'Upload failed. Please try again.'
+        setError(msg)
+        setPasswordPromptOpen(false)
+        setPasswordFile(null)
+      }
     }
+  }
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault()
+    if (passwordFile && passwordInput) {
+      handleUpload(passwordFile, passwordInput)
+    }
+  }
+
+  const handleCancelPassword = () => {
+    setPasswordPromptOpen(false)
+    setPasswordFile(null)
+    setPasswordInput('')
+    setPasswordError(null)
   }
 
   const handleSelectHistory = async (doc) => {
@@ -326,6 +364,73 @@ export default function App() {
         <div className="content-area">
           <AnimatePresence>
             {isLoading && <Loader />}
+          </AnimatePresence>
+
+          {/* Password Prompt Modal */}
+          <AnimatePresence>
+            {passwordPromptOpen && (
+              <div className="loader-overlay" style={{ zIndex: 300 }}>
+                <motion.div
+                  className="loader-card"
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.94 }}
+                  style={{ width: '360px', padding: '2rem' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem', color: 'var(--accent)' }}>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                  </div>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+                    Password Protected PDF
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
+                    Enter the password to decrypt <strong>{passwordFile?.name}</strong>.
+                  </p>
+
+                  {passwordError && (
+                    <div className="error-banner" style={{ fontSize: '0.78rem', padding: '8px 12px', marginBottom: '1rem', justifyContent: 'center' }}>
+                      {passwordError}
+                    </div>
+                  )}
+
+                  <form onSubmit={handlePasswordSubmit}>
+                    <div className="input-group" style={{ marginBottom: '1.25rem', textAlign: 'left' }}>
+                      <input
+                        type="password"
+                        className="input-field"
+                        placeholder="Enter password..."
+                        value={passwordInput}
+                        onChange={(e) => setPasswordInput(e.target.value)}
+                        required
+                        autoFocus
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        className="btn btn-ghost"
+                        style={{ flex: 1 }}
+                        onClick={handleCancelPassword}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        style={{ flex: 1 }}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Processing...' : 'Decrypt & Upload'}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </div>
+            )}
           </AnimatePresence>
 
           {!dashboardData ? (
