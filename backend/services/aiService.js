@@ -1,6 +1,4 @@
-const Groq = require('groq-sdk');
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Using standard native fetch built into Node.js
 
 const DASHBOARD_PROMPT = `
 You are a data extraction and dashboard generation expert.
@@ -55,40 +53,65 @@ Rules:
 `;
 
 /**
- * Extract dashboard data from document text using Groq/LLaMA 3.3.
- * Limited to 20k chars due to Groq free tier 12k TPM limit.
+ * Extract dashboard data from document text using OpenAI gpt-oss-120b via OpenRouter.
+ * Context limit is set to 150k characters (approx 110k tokens/30k words).
  */
 const extractDashboardData = async (text, fileName) => {
-  const MAX_CHARS = 20000;
+  const MAX_CHARS = 150000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to Groq`);
+  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to gpt-oss-120b on OpenRouter`);
 
-  const chatCompletion = await groq.chat.completions.create({
-    messages: [
-      { role: 'system', content: DASHBOARD_PROMPT },
-      {
-        role: 'user',
-        content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
-      }
-    ],
-    model: 'llama-3.3-70b-versatile',
-    temperature: 0.2,
-    max_completion_tokens: 2000,
-    top_p: 1,
-    stream: false,
-    stop: null
-  });
-
-  let raw = chatCompletion.choices[0]?.message?.content?.trim();
-
-  if (!raw) {
-    throw new Error('AI returned an empty response. Please try again.');
+  if (!process.env.OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
   }
 
-  raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+  try {
+    const response = await fetch(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
+          'X-Title': 'DocDash'
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-oss-120b:free',
+          messages: [
+            { role: 'system', content: DASHBOARD_PROMPT },
+            {
+              role: 'user',
+              content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
+            }
+          ],
+          temperature: 0.1,
+          response_format: { type: 'json_object' }
+        })
+      }
+    );
 
-  return JSON.parse(raw);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
+    }
+
+    const data = await response.json();
+    let raw = data?.choices[0]?.message?.content?.trim();
+
+    if (!raw) {
+      throw new Error('AI returned an empty response. Please try again.');
+    }
+
+    // Clean up potential markdown formatting if returned
+    raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error('❌ OpenRouter API Error:', error.message);
+    throw new Error(`AI processing failed: ${error.message}`);
+  }
 };
 
 module.exports = { extractDashboardData };
