@@ -36,7 +36,7 @@ export default function Loader() {
       >
         <div className="loader-spinner" />
         <div className="loader-label">Processing document</div>
-        <div className="loader-sublabel">Gemini AI is analyzing your file…</div>
+        <div className="loader-sublabel">AI is analyzing your file…</div>
         <div className="loader-steps">
           {STEPS.map((step, i) => (
             <div

@@ -304,7 +304,7 @@ export default function App() {
         <div className="navbar-right">
           <span className="nav-pill">
             <span className="nav-pill-dot" />
-            Powered by Gemini
+            AI Powered
           </span>
           
           <div className="dropdown-container" ref={userMenuRef}>
@@ -369,7 +369,7 @@ export default function App() {
 
         <div className="content-area">
           <AnimatePresence>
-            {isLoading && <Loader />}
+            {isLoading && !passwordPromptOpen && <Loader />}
           </AnimatePresence>
 
           {/* Password Prompt Modal */}
