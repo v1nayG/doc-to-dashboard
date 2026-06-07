@@ -292,8 +292,14 @@ export default function App() {
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-          <img src="/logo.png" alt="DocDash" style={{ width: 26, height: 26, borderRadius: 7, objectFit: 'cover' }} />
-          DocDash
+          <span
+            onClick={() => navigate(PAGE.LANDING)}
+            style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', userSelect: 'none' }}
+            title="Go to Home"
+          >
+            <img src="/logo.png" alt="DocDash" style={{ width: 26, height: 26, borderRadius: 7, objectFit: 'cover' }} />
+            DocDash
+          </span>
         </div>
         <div className="navbar-right">
           <span className="nav-pill">
@@ -441,7 +447,7 @@ export default function App() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 textAlign: 'center',
-                padding: '48px 2rem 32px',
+                padding: '20px 2rem 12px',
                 fontFamily: "'Inter', sans-serif",
               }}>
                 <motion.div
@@ -456,7 +462,7 @@ export default function App() {
                     padding: '5px 16px', borderRadius: 999,
                     fontSize: '0.78rem', fontWeight: 600,
                     letterSpacing: '0.06em', textTransform: 'uppercase',
-                    marginBottom: '1.5rem',
+                    marginBottom: '0.85rem',
                   }}
                 >
                   <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8a0e0', display: 'inline-block', animation: 'pulse 2s infinite' }} />
@@ -468,12 +474,12 @@ export default function App() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1, duration: 0.7 }}
                   style={{
-                    fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+                    fontSize: 'clamp(1.6rem, 4vw, 2.6rem)',
                     fontWeight: 300,
                     lineHeight: 1.1,
                     letterSpacing: '-0.03em',
                     color: '#f0f0f5',
-                    marginBottom: '1rem',
+                    marginBottom: '0.65rem',
                   }}
                 >
                   Turn documents into{' '}
@@ -490,9 +496,9 @@ export default function App() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
-                  style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', maxWidth: 440, lineHeight: 1.7, marginBottom: '2rem' }}
+                  style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', maxWidth: 440, lineHeight: 1.6, marginBottom: '1.25rem' }}
                 >
-                  Upload a PDF, spreadsheet, or image. Gemini AI extracts structured data and builds an interactive dashboard instantly.
+                  Upload a PDF, spreadsheet, or image. AI extracts structured data and builds an interactive dashboard instantly.
                 </motion.p>
               </div>
 
