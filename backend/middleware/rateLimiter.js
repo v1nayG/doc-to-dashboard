@@ -3,7 +3,7 @@ const rateLimit = require('express-rate-limit');
 // Auth routes — strict: prevent brute-force login/register attempts
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,  // 15 minutes
-    max: 100,                   // relaxed for local dev — lower to 10 in production
+    max: 10,                   // 10 attempts per 15 mins
     message: { error: 'Too many auth attempts. Please wait 15 minutes and try again.' },
     standardHeaders: true,
     legacyHeaders: false,
