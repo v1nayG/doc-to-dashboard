@@ -60,7 +60,7 @@ const extractDashboardData = async (text, fileName) => {
   const MAX_CHARS = 150000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to nemotron-3-super on OpenRouter`);
+  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to nemotron-3-ultra on OpenRouter`);
 
   if (!process.env.OPENROUTER_API_KEY) {
     throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
@@ -78,7 +78,7 @@ const extractDashboardData = async (text, fileName) => {
           'X-Title': 'DocDash'
         },
         body: JSON.stringify({
-          model: 'nvidia/nemotron-3-super:free',
+          model: 'nvidia/nemotron-3-ultra:free',
           messages: [
             { role: 'system', content: DASHBOARD_PROMPT },
             {
