@@ -17,7 +17,7 @@ const uploadDocument = async (req, res) => {
 
     try {
         // Extract text from document (PDF, Excel, CSV)
-        const { text } = await extractText(filePath, originalName);
+        const { text } = await extractText(filePath, originalName, req.body.password);
 
         if (!text || text.trim().length < 20) {
             return res.status(422).json({
@@ -53,7 +53,21 @@ const uploadDocument = async (req, res) => {
     } catch (err) {
         // Clean up file on error
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        console.error('Upload error:', err.message);
+        console.error('Upload error:', err.message, err.name);
+
+        // Check if the error is due to password protection
+        if (
+            err.name === 'PasswordException' || 
+            err.message.includes('Password') || 
+            err.message.includes('password') ||
+            err.message.includes('PasswordException')
+        ) {
+            const isIncorrect = !!req.body.password;
+            return res.status(401).json({
+                requiresPassword: true,
+                error: isIncorrect ? 'Incorrect password. Please try again.' : 'This PDF is password-protected.'
+            });
+        }
 
         if (err.message.includes('JSON')) {
             return res.status(500).json({

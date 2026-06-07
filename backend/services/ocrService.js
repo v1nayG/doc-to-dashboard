@@ -6,10 +6,13 @@ const path = require('path');
 /**
  * Extract text from a PDF using pdfjs-dist (already installed)
  */
-const extractPdfText = async (filePath) => {
+const extractPdfText = async (filePath, password) => {
     const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
     const data = new Uint8Array(fs.readFileSync(filePath));
-    const doc = await pdfjsLib.getDocument({ data }).promise;
+    const doc = await pdfjsLib.getDocument({ 
+        data,
+        password: password || undefined
+    }).promise;
 
     let fullText = '';
     for (let i = 1; i <= doc.numPages; i++) {
@@ -26,12 +29,12 @@ const extractPdfText = async (filePath) => {
  * ALL file types are parsed to text locally, then sent to Groq.
  * Returns { text }
  */
-const extractText = async (filePath, originalName) => {
+const extractText = async (filePath, originalName, password) => {
     const ext = path.extname(originalName).toLowerCase();
 
     // PDFs → parse text locally using pdfjs-dist
     if (ext === '.pdf') {
-        const text = await extractPdfText(filePath);
+        const text = await extractPdfText(filePath, password);
 
         if (!text || text.trim().length < 20) {
             throw new Error(
