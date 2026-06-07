@@ -79,6 +79,7 @@ const extractDashboardData = async (text, fileName) => {
         },
         body: JSON.stringify({
           model: 'openrouter/owl-alpha',
+          max_tokens: 8192,
           messages: [
             { role: 'system', content: DASHBOARD_PROMPT },
             {
