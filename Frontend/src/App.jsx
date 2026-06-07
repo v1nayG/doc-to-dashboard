@@ -402,38 +402,44 @@ export default function App() {
                     </div>
                   )}
 
-                  <form onSubmit={handlePasswordSubmit}>
-                    <div className="input-group" style={{ marginBottom: '1.25rem', textAlign: 'left' }}>
-                      <input
-                        type="password"
-                        className="input-field"
-                        placeholder="Enter password..."
-                        value={passwordInput}
-                        onChange={(e) => setPasswordInput(e.target.value)}
-                        required
-                        autoFocus
-                      />
+                  {isLoading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 0', gap: '12px' }}>
+                      <div className="loader-spinner" style={{ width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.1)', borderTop: '3px solid var(--accent)' }} />
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Decrypting and analyzing file…</p>
                     </div>
+                  ) : (
+                    <form onSubmit={handlePasswordSubmit}>
+                      <div className="input-group" style={{ marginBottom: '1.25rem', textAlign: 'left' }}>
+                        <input
+                          type="password"
+                          className="input-field"
+                          placeholder="Enter password..."
+                          value={passwordInput}
+                          onChange={(e) => setPasswordInput(e.target.value)}
+                          required
+                          autoFocus
+                        />
+                      </div>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        type="button"
-                        className="btn btn-ghost"
-                        style={{ flex: 1 }}
-                        onClick={handleCancelPassword}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ flex: 1 }}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? 'Processing...' : 'Decrypt & Upload'}
-                      </button>
-                    </div>
-                  </form>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          type="button"
+                          className="btn btn-ghost"
+                          style={{ flex: 1 }}
+                          onClick={handleCancelPassword}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="btn btn-primary"
+                          style={{ flex: 1 }}
+                        >
+                          Decrypt & Upload
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </motion.div>
               </div>
             )}
