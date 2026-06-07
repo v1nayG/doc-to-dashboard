@@ -60,112 +60,55 @@ const extractDashboardData = async (text, fileName) => {
   const MAX_CHARS = 150000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  const isLarge = text.length > 30000;
+  console.log(`📄 Processing "${fileName}" (${text.length} chars) → routing to Owl Alpha on OpenRouter`);
+  
+  if (!process.env.OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
+  }
 
-  if (isLarge) {
-    // Large File Route: OpenRouter Owl Alpha
-    console.log(`📄 Processing large file "${fileName}" (${text.length} chars) → routing to Owl Alpha on OpenRouter`);
-    
-    if (!process.env.OPENROUTER_API_KEY) {
-      throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
+  try {
+    const response = await fetch(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
+          'X-Title': 'DocDash'
+        },
+        body: JSON.stringify({
+          model: 'openrouter/owl-alpha',
+          messages: [
+            { role: 'system', content: DASHBOARD_PROMPT },
+            {
+              role: 'user',
+              content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
+            }
+          ],
+          temperature: 0.1,
+          response_format: { type: 'json_object' }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
     }
 
-    try {
-      const response = await fetch(
-        'https://openrouter.ai/api/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
-            'X-Title': 'DocDash'
-          },
-          body: JSON.stringify({
-            model: 'openrouter/owl-alpha',
-            messages: [
-              { role: 'system', content: DASHBOARD_PROMPT },
-              {
-                role: 'user',
-                content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
-              }
-            ],
-            temperature: 0.1,
-            response_format: { type: 'json_object' }
-          })
-        }
-      );
+    const data = await response.json();
+    let raw = data?.choices[0]?.message?.content?.trim();
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
-      }
-
-      const data = await response.json();
-      let raw = data?.choices[0]?.message?.content?.trim();
-
-      if (!raw) {
-        throw new Error('AI returned an empty response. Please try again.');
-      }
-
-      raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-      return JSON.parse(raw);
-    } catch (error) {
-      console.error('❌ OpenRouter API Error:', error.message);
-      throw new Error(`AI processing failed: ${error.message}`);
-    }
-  } else {
-    // Small File Route: OpenRouter Google Gemma 9B (Fast, high rate limits, very stable)
-    console.log(`📄 Processing small file "${fileName}" (${text.length} chars) → routing to Gemma 9B on OpenRouter`);
-    
-    if (!process.env.OPENROUTER_API_KEY) {
-      throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
+    if (!raw) {
+      throw new Error('AI returned an empty response. Please try again.');
     }
 
-    try {
-      const response = await fetch(
-        'https://openrouter.ai/api/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
-            'X-Title': 'DocDash'
-          },
-          body: JSON.stringify({
-            model: 'google/gemma-2-9b-it:free',
-            messages: [
-              { role: 'system', content: DASHBOARD_PROMPT },
-              {
-                role: 'user',
-                content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
-              }
-            ],
-            temperature: 0.1,
-            response_format: { type: 'json_object' }
-          })
-        }
-      );
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
-      }
-
-      const data = await response.json();
-      let raw = data?.choices[0]?.message?.content?.trim();
-
-      if (!raw) {
-        throw new Error('AI returned an empty response. Please try again.');
-      }
-
-      raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-      return JSON.parse(raw);
-    } catch (error) {
-      console.error('❌ OpenRouter API Error:', error.message);
-      throw new Error(`AI processing failed: ${error.message}`);
-    }
+    raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error('❌ OpenRouter API Error:', error.message);
+    throw new Error(`AI processing failed: ${error.message}`);
   }
 };
 
