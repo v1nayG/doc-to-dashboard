@@ -60,62 +60,112 @@ const extractDashboardData = async (text, fileName) => {
   const MAX_CHARS = 150000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  // Dynamic Routing: Choose model based on size (Threshold: 30k chars ~ 5k tokens)
-  const modelName = text.length > 30000 
-    ? 'openrouter/owl-alpha' 
-    : 'meta-llama/llama-3.3-70b-instruct:free';
+  const isLarge = text.length > 30000;
 
-  console.log(`📄 Processing "${fileName}" — ${text.length} chars → dynamically routing to "${modelName}" on OpenRouter`);
+  if (isLarge) {
+    // Large File Route: OpenRouter Owl Alpha
+    console.log(`📄 Processing large file "${fileName}" (${text.length} chars) → routing to Owl Alpha on OpenRouter`);
+    
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
+    }
 
-  if (!process.env.OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
-  }
+    try {
+      const response = await fetch(
+        'https://openrouter.ai/api/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
+            'X-Title': 'DocDash'
+          },
+          body: JSON.stringify({
+            model: 'openrouter/owl-alpha',
+            messages: [
+              { role: 'system', content: DASHBOARD_PROMPT },
+              {
+                role: 'user',
+                content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
+              }
+            ],
+            temperature: 0.1,
+            response_format: { type: 'json_object' }
+          })
+        }
+      );
 
-  try {
-    const response = await fetch(
-      'https://openrouter.ai/api/v1/chat/completions',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
-          'X-Title': 'DocDash'
-        },
-        body: JSON.stringify({
-          model: modelName,
-          messages: [
-            { role: 'system', content: DASHBOARD_PROMPT },
-            {
-              role: 'user',
-              content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
-            }
-          ],
-          temperature: 0.1,
-          response_format: { type: 'json_object' }
-        })
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
       }
-    );
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
+      const data = await response.json();
+      let raw = data?.choices[0]?.message?.content?.trim();
+
+      if (!raw) {
+        throw new Error('AI returned an empty response. Please try again.');
+      }
+
+      raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error('❌ OpenRouter API Error:', error.message);
+      throw new Error(`AI processing failed: ${error.message}`);
+    }
+  } else {
+    // Small File Route: Direct Gemini 2.5 Flash (Bypass OpenRouter to avoid rate limits)
+    console.log(`📄 Processing small file "${fileName}" (${text.length} chars) → routing directly to Gemini 2.5 Flash`);
+    
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY is not configured in backend .env file');
     }
 
-    const data = await response.json();
-    let raw = data?.choices[0]?.message?.content?.trim();
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: DASHBOARD_PROMPT },
+                  { text: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}` }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.1,
+              responseMimeType: 'application/json'
+            }
+          })
+        }
+      );
 
-    if (!raw) {
-      throw new Error('AI returned an empty response. Please try again.');
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Gemini API returned status ${response.status}: ${errText}`);
+      }
+
+      const data = await response.json();
+      let raw = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+      if (!raw) {
+        throw new Error('Gemini API returned an empty response. Please try again.');
+      }
+
+      raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error('❌ Gemini API Error:', error.message);
+      throw new Error(`AI processing failed: ${error.message}`);
     }
-
-    // Clean up potential markdown formatting if returned
-    raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-
-    return JSON.parse(raw);
-  } catch (error) {
-    console.error('❌ OpenRouter API Error:', error.message);
-    throw new Error(`AI processing failed: ${error.message}`);
   }
 };
 
