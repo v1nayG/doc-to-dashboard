@@ -47,7 +47,7 @@ For Bank Statements specifically, include:
   2. Monthly Summary (Month, Total Spent, Total Received, Net)
 
 Rules:
-- Extract ALL transactions — do not skip any
+- Extract ALL transactions visible in the text
 - Use ₹ as currency unit for Indian documents
 - All "value" fields in chart data arrays MUST be numbers, not strings
 - Include at least 4 charts and 2 tables for bank statements
@@ -55,22 +55,18 @@ Rules:
 `;
 
 /**
- * Extract dashboard data from document text using Groq/LLaMA.
- * Sends up to 50,000 characters — covers most large PDFs in one shot.
- * LLaMA 3.3-70b-versatile supports 128k token context window.
+ * Extract dashboard data from document text using Groq/LLaMA 3.3.
+ * Limited to 20k chars due to Groq free tier 12k TPM limit.
  */
 const extractDashboardData = async (text, fileName) => {
-  const MAX_CHARS = 20000; // ~5,000 tokens — fits within Groq free tier 12k TPM limit
+  const MAX_CHARS = 20000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} chars to Groq`);
+  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to Groq`);
 
   const chatCompletion = await groq.chat.completions.create({
     messages: [
-      {
-        role: 'system',
-        content: DASHBOARD_PROMPT
-      },
+      { role: 'system', content: DASHBOARD_PROMPT },
       {
         role: 'user',
         content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
@@ -87,10 +83,9 @@ const extractDashboardData = async (text, fileName) => {
   let raw = chatCompletion.choices[0]?.message?.content?.trim();
 
   if (!raw) {
-    throw new Error('AI returned an empty response. Please try again or use a smaller document.');
+    throw new Error('AI returned an empty response. Please try again.');
   }
 
-  // Strip markdown code blocks if the model wraps response in them
   raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
 
   return JSON.parse(raw);
