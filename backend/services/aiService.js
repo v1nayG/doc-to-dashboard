@@ -78,7 +78,7 @@ const extractDashboardData = async (text, fileName) => {
           'X-Title': 'DocDash'
         },
         body: JSON.stringify({
-          model: 'google/gemma-4-31b:free',
+          model: 'google/gemma-4-31b-it:free',
           messages: [
             { role: 'system', content: DASHBOARD_PROMPT },
             {
