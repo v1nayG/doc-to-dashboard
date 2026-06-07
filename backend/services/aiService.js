@@ -1,4 +1,4 @@
-// Using standard native fetch built into Node.js
+// Using standard native fetch built into Node.js to call Google Gemini API
 
 const DASHBOARD_PROMPT = `
 You are a data extraction and dashboard generation expert.
@@ -53,55 +53,55 @@ Rules:
 `;
 
 /**
- * Extract dashboard data from document text using OpenAI gpt-oss-120b via OpenRouter.
+ * Extract dashboard data from document text using Google Gemini 2.5 Flash API directly.
  * Context limit is set to 150k characters (approx 110k tokens/30k words).
  */
 const extractDashboardData = async (text, fileName) => {
   const MAX_CHARS = 150000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to qwen3-next-80b on OpenRouter`);
+  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to Gemini 2.5 Flash`);
 
-  if (!process.env.OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not configured in backend .env file');
   }
 
   try {
     const response = await fetch(
-      'https://openrouter.ai/api/v1/chat/completions',
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
-          'X-Title': 'DocDash'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
-          messages: [
-            { role: 'system', content: DASHBOARD_PROMPT },
+          contents: [
             {
-              role: 'user',
-              content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
+              parts: [
+                { text: DASHBOARD_PROMPT },
+                { text: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}` }
+              ]
             }
           ],
-          temperature: 0.1,
-          response_format: { type: 'json_object' }
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: 'application/json'
+          }
         })
       }
     );
 
     if (!response.ok) {
       const errText = await response.text();
-      throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
+      throw new Error(`Gemini API returned status ${response.status}: ${errText}`);
     }
 
     const data = await response.json();
-    let raw = data?.choices[0]?.message?.content?.trim();
+    let raw = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
     if (!raw) {
-      throw new Error('AI returned an empty response. Please try again.');
+      throw new Error('Gemini API returned an empty response. Please try again.');
     }
 
     // Clean up potential markdown formatting if returned
@@ -109,7 +109,7 @@ const extractDashboardData = async (text, fileName) => {
 
     return JSON.parse(raw);
   } catch (error) {
-    console.error('❌ OpenRouter API Error:', error.message);
+    console.error('❌ Gemini API Error:', error.message);
     throw new Error(`AI processing failed: ${error.message}`);
   }
 };
