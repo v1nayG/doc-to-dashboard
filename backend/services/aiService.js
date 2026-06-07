@@ -1,10 +1,6 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel(
-  { model: 'gemini-1.5-flash-latest' },
-  { apiVersion: 'v1' }
-);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const DASHBOARD_PROMPT = `
 You are a data extraction and dashboard generation expert.
@@ -42,10 +38,10 @@ Return a valid JSON object with EXACTLY this structure:
 For Bank Statements specifically, include:
 - KPIs: Total Spent, Total Received, Net Balance, Largest Transaction, Total Transactions, Avg Transaction Value
 - Charts:
-  1. Monthly Spending (bar chart — group debits by month)
-  2. Top 10 Merchants by spend (bar chart)
-  3. Credit vs Debit (pie chart — 2 slices only)
-  4. Monthly Income vs Spending (area or line chart)
+  1. Monthly Spending — bar chart grouped by month
+  2. Top 10 Merchants by spend — bar chart
+  3. Credit vs Debit — pie chart with 2 slices only
+  4. Monthly Income vs Spending — area or line chart
 - Tables:
   1. Top 20 largest transactions (Date, Description, Amount, Type)
   2. Monthly Summary (Month, Total Spent, Total Received, Net)
@@ -59,24 +55,42 @@ Rules:
 `;
 
 /**
- * Extract dashboard data from document text using Gemini AI.
- * Sends the FULL document text — no truncation, no chunking.
- * Gemini 2.0 Flash supports up to 1M tokens context.
+ * Extract dashboard data from document text using Groq/LLaMA.
+ * Sends up to 50,000 characters — covers most large PDFs in one shot.
+ * LLaMA 3.3-70b-versatile supports 128k token context window.
  */
 const extractDashboardData = async (text, fileName) => {
-  console.log(`📄 Processing "${fileName}" — ${text.length} characters → Gemini 2.0 Flash`);
+  const MAX_CHARS = 50000; // ~12,500 tokens — safe for LLaMA 3.3 128k context
+  const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  const prompt = `${DASHBOARD_PROMPT}\n\nFile: ${fileName}\n\nDocument content:\n${text}`;
+  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} chars to Groq`);
 
-  const result = await model.generateContent(prompt);
-  const response = result.response;
-  let raw = response.text().trim();
+  const chatCompletion = await groq.chat.completions.create({
+    messages: [
+      {
+        role: 'system',
+        content: DASHBOARD_PROMPT
+      },
+      {
+        role: 'user',
+        content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
+      }
+    ],
+    model: 'llama-3.3-70b-versatile',
+    temperature: 0.2,
+    max_completion_tokens: 4000,
+    top_p: 1,
+    stream: false,
+    stop: null
+  });
+
+  let raw = chatCompletion.choices[0]?.message?.content?.trim();
 
   if (!raw) {
-    throw new Error('Gemini returned an empty response. Please try again.');
+    throw new Error('AI returned an empty response. Please try again or use a smaller document.');
   }
 
-  // Strip markdown fences if model wraps response in them
+  // Strip markdown code blocks if the model wraps response in them
   raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
 
   return JSON.parse(raw);
