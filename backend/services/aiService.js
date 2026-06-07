@@ -60,7 +60,12 @@ const extractDashboardData = async (text, fileName) => {
   const MAX_CHARS = 150000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to owl-alpha on OpenRouter`);
+  // Dynamic Routing: Choose model based on size (Threshold: 30k chars ~ 5k tokens)
+  const modelName = text.length > 30000 
+    ? 'openrouter/owl-alpha' 
+    : 'meta-llama/llama-3.3-70b-instruct:free';
+
+  console.log(`📄 Processing "${fileName}" — ${text.length} chars → dynamically routing to "${modelName}" on OpenRouter`);
 
   if (!process.env.OPENROUTER_API_KEY) {
     throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
@@ -78,7 +83,7 @@ const extractDashboardData = async (text, fileName) => {
           'X-Title': 'DocDash'
         },
         body: JSON.stringify({
-          model: 'openrouter/owl-alpha',
+          model: modelName,
           messages: [
             { role: 'system', content: DASHBOARD_PROMPT },
             {
