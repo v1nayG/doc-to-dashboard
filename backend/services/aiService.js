@@ -60,7 +60,7 @@ Rules:
  * LLaMA 3.3-70b-versatile supports 128k token context window.
  */
 const extractDashboardData = async (text, fileName) => {
-  const MAX_CHARS = 50000; // ~12,500 tokens — safe for LLaMA 3.3 128k context
+  const MAX_CHARS = 20000; // ~5,000 tokens — fits within Groq free tier 12k TPM limit
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
   console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} chars to Groq`);
@@ -78,7 +78,7 @@ const extractDashboardData = async (text, fileName) => {
     ],
     model: 'llama-3.3-70b-versatile',
     temperature: 0.2,
-    max_completion_tokens: 4000,
+    max_completion_tokens: 2000,
     top_p: 1,
     stream: false,
     stop: null
