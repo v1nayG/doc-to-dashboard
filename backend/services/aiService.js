@@ -60,7 +60,7 @@ const extractDashboardData = async (text, fileName) => {
   const MAX_CHARS = 150000;
   const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
 
-  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to gemma-4-31b on OpenRouter`);
+  console.log(`📄 Processing "${fileName}" — ${text.length} chars → sending ${truncated.length} to qwen3-next-80b on OpenRouter`);
 
   if (!process.env.OPENROUTER_API_KEY) {
     throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
@@ -78,7 +78,7 @@ const extractDashboardData = async (text, fileName) => {
           'X-Title': 'DocDash'
         },
         body: JSON.stringify({
-          model: 'google/gemma-4-31b-it:free',
+          model: 'qwen/qwen3-next-80b-a3b-instruct:free',
           messages: [
             { role: 'system', content: DASHBOARD_PROMPT },
             {
