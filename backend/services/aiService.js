@@ -115,55 +115,55 @@ const extractDashboardData = async (text, fileName) => {
       throw new Error(`AI processing failed: ${error.message}`);
     }
   } else {
-    // Small File Route: Direct Gemini 2.5 Flash (Bypass OpenRouter to avoid rate limits)
-    console.log(`📄 Processing small file "${fileName}" (${text.length} chars) → routing directly to Gemini 2.5 Flash`);
+    // Small File Route: OpenRouter Google Gemma 9B (Fast, high rate limits, very stable)
+    console.log(`📄 Processing small file "${fileName}" (${text.length} chars) → routing to Gemma 9B on OpenRouter`);
     
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured in backend .env file');
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
     }
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        'https://openrouter.ai/api/v1/chat/completions',
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
+            'X-Title': 'DocDash'
           },
           body: JSON.stringify({
-            contents: [
+            model: 'google/gemma-2-9b-it:free',
+            messages: [
+              { role: 'system', content: DASHBOARD_PROMPT },
               {
-                parts: [
-                  { text: DASHBOARD_PROMPT },
-                  { text: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}` }
-                ]
+                role: 'user',
+                content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
               }
             ],
-            generationConfig: {
-              temperature: 0.1,
-              responseMimeType: 'application/json'
-            }
+            temperature: 0.1,
+            response_format: { type: 'json_object' }
           })
         }
       );
 
       if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`Gemini API returned status ${response.status}: ${errText}`);
+        throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
       }
 
       const data = await response.json();
-      let raw = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      let raw = data?.choices[0]?.message?.content?.trim();
 
       if (!raw) {
-        throw new Error('Gemini API returned an empty response. Please try again.');
+        throw new Error('AI returned an empty response. Please try again.');
       }
 
       raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
       return JSON.parse(raw);
     } catch (error) {
-      console.error('❌ Gemini API Error:', error.message);
+      console.error('❌ OpenRouter API Error:', error.message);
       throw new Error(`AI processing failed: ${error.message}`);
     }
   }
