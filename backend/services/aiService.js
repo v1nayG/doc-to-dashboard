@@ -1,4 +1,6 @@
-// Using standard native fetch built into Node.js to call Google Gemini API
+const Groq = require('groq-sdk');
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const DASHBOARD_PROMPT = `
 You are a data extraction and dashboard generation expert.
@@ -52,14 +54,8 @@ Rules:
 - Return ONLY valid JSON — no markdown, no backticks, no explanation
 `;
 
-/**
- * Extract dashboard data from document text using Google Gemini 2.5 Flash API directly.
- * Context limit is set to 150k characters (approx 110k tokens/30k words).
- */
 const extractDashboardData = async (text, fileName) => {
-  const MAX_CHARS = 150000;
-  const truncated = text.length > MAX_CHARS ? text.substring(0, MAX_CHARS) : text;
-
+  const truncated = text.substring(0, 30000);
   console.log(`📄 Processing "${fileName}" (${text.length} chars) → routing to Owl Alpha on OpenRouter`);
   
   if (!process.env.OPENROUTER_API_KEY) {
