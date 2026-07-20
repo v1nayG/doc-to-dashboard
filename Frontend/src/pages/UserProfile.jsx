@@ -39,10 +39,12 @@ export default function UserProfile({ user, onBack }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', fontWeight: 600 }}>
-              {(user?.username || user?.email || 'U')[0].toUpperCase()}
+          <div className="profile-header" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem' }}>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#fbbf24', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', fontWeight: 600 }}>
+              {user?.name ? user.name.charAt(0).toUpperCase() : (user?.username || user?.email || 'U')[0].toUpperCase()}
             </div>
+            </motion.div>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>{user?.username || 'User'}</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -54,7 +56,7 @@ export default function UserProfile({ user, onBack }) {
           <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem', color: 'var(--text-primary)' }}>Preferences</h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: 'var(--bg-hover)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ background: 'var(--bg-elevated)', padding: '8px', borderRadius: '8px' }}>
                   <Shield size={18} className="text-accent" />
@@ -70,7 +72,7 @@ export default function UserProfile({ user, onBack }) {
               </label>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', padding: '1rem', background: 'var(--bg-hover)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ background: 'var(--bg-elevated)', padding: '8px', borderRadius: '8px' }}>

@@ -332,7 +332,7 @@
     inset 1px 1px 1px rgba(255, 255, 255, 0.04);
 }
 
-/* magenta arc glow inside CTA — matches hero card feel */
+/* white arc glow inside CTA — matches hero card feel */
 .cta-inner::before {
   content: '';
   position: absolute;
@@ -340,11 +340,11 @@
   background: radial-gradient(
     circle at 50% -60%,
     transparent 58%,
-    rgba(176, 48, 136, 0.06) 63%,
-    rgba(176, 48, 136, 0.18) 68%,
-    rgba(176, 48, 136, 0.32) 73%,
-    rgba(210, 70, 175, 0.45) 80%,
-    rgba(255, 210, 255, 0.6) 89%,
+    rgba(255, 255, 255, 0.03) 63%,
+    rgba(255, 255, 255, 0.08) 68%,
+    rgba(255, 255, 255, 0.15) 73%,
+    rgba(255, 255, 255, 0.25) 80%,
+    rgba(255, 255, 255, 0.4) 89%,
     #fff 94%
   );
   z-index: 0;
@@ -432,9 +432,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(200, 160, 224, 0.08);
-  border: 1px solid rgba(200, 160, 224, 0.18);
-  color: rgba(200, 160, 224, 0.7);
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.18);
+  color: rgba(251, 191, 36, 0.85);
   padding: 5px 12px;
   border-radius: 999px;
   font-size: 0.72rem;

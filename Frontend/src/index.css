@@ -1330,3 +1330,215 @@ textarea.input-field {
 
 
          
+/* =========================================
+   LIGHT THEME OVERRIDES
+   ========================================= */
+[data-theme='light'] {
+  --bg-base:        #f4f4f5; /* zinc-100 */
+  --bg-surface:     rgba(255, 255, 255, 0.7); /* translucent for glassmorphism */
+  --bg-elevated:    rgba(255, 255, 255, 0.95);
+  --bg-hover:       rgba(0, 0, 0, 0.05); /* zinc-200 eq */
+
+  --border:         rgba(0, 0, 0, 0.08);
+  --border-strong:  rgba(0, 0, 0, 0.15);
+
+  --accent:         #fbbf24;
+  --accent-dim:     rgba(251, 191, 36, 0.2);
+  --accent-hover:   #f59e0b;
+
+  --text-primary:   #09090b; /* zinc-950 */
+  --text-secondary: #52525b; /* zinc-600 */
+  --text-muted:     #a1a1aa; /* zinc-400 */
+
+  --green-dim:      rgba(16, 185, 129, 0.15);
+  --red-dim:        rgba(248, 113, 113, 0.15);
+  --amber-dim:      rgba(251, 191, 36, 0.15);
+  
+  --shadow-sm:  0 4px 12px rgba(0,0,0,0.05);
+  --shadow-md:  4px 4px 16px rgba(0,0,0,0.06), inset 1px 1px 1px rgba(255,255,255,0.8);
+}
+
+[data-theme='light'] .navbar {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+[data-theme='light'] .history-item {
+  background: var(--bg-hover);
+}
+
+[data-theme='light'] .history-item:hover {
+  background: var(--border);
+}
+
+[data-theme='light'] .upload-zone {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
+}
+
+[data-theme='light'] .upload-zone:hover {
+  background: var(--bg-elevated);
+  border: 1px dashed var(--accent);
+}
+
+[data-theme='light'] .upload-icon-wrap {
+  background: var(--bg-hover);
+}
+
+[data-theme='light'] .btn-primary {
+  background: var(--text-primary) !important;
+  color: var(--bg-base) !important;
+}
+
+[data-theme='light'] .kpi-card,
+[data-theme='light'] .chart-card,
+[data-theme='light'] .data-table-container,
+[data-theme='light'] .chat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme='light'] .chart-type-btn {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+[data-theme='light'] .chart-type-btn:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme='light'] .chart-type-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: transparent;
+}
+
+[data-theme='light'] th {
+  border-bottom: 1px solid var(--border-strong);
+}
+
+[data-theme='light'] td {
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme='light'] .action-btn.export {
+  background: var(--text-primary);
+  color: var(--bg-base);
+}
+
+[data-theme='light'] .loader-spinner {
+  border: 3px solid var(--border-strong);
+  border-top: 3px solid var(--accent);
+}
+
+/* =========================================
+   SIDEBAR & CHART COLOR VARIABLES
+   ========================================= */
+:root {
+  --chart-1: #ffffff;
+  --chart-2: #d4d4d8;
+  --chart-3: #a1a1aa;
+  --chart-4: #e4e4e7;
+  --chart-5: #f4f4f5;
+}
+
+[data-theme='light'] {
+  --chart-1: #4285F4; /* Google Blue */
+  --chart-2: #EA4335; /* Google Red */
+  --chart-3: #FBBC05; /* Google Yellow */
+  --chart-4: #34A853; /* Google Green */
+  --chart-5: #12B5CB; /* Google Cyan */
+}
+
+[data-theme='light'] .btn-ghost {
+  background: var(--bg-hover) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+[data-theme='light'] .btn-ghost:hover {
+  background: var(--border) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-primary) !important;
+}
+
+.sidebar-title {
+  color: var(--text-muted) !important;
+}
+.sidebar-empty p {
+  color: var(--text-secondary) !important;
+}
+.sidebar-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.sidebar {
+  background: var(--bg-base) !important;
+}
+[data-theme='light'] .sidebar {
+  background: var(--bg-surface) !important;
+}
+.history-list::-webkit-scrollbar-thumb {
+  background: var(--border-strong) !important;
+}
+.history-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted) !important;
+}
+
+[data-theme='light'] .upload-btn {
+  background: var(--text-primary) !important;
+  color: var(--bg-base) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.recharts-text {
+  fill: var(--text-muted) !important;
+}
+
+/* =========================================
+   DROPDOWN & CHART GRID VISIBILITY FIXES
+   ========================================= */
+[data-theme='light'] .dropdown-menu {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-strong) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+[data-theme='light'] .dropdown-item {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme='light'] .dropdown-item:hover {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Force Recharts grid and axis lines to use border-strong for visibility */
+[data-theme='light'] .recharts-cartesian-grid-horizontal line,
+[data-theme='light'] .recharts-cartesian-axis-line {
+  stroke: var(--border-strong) !important;
+}
+
+/* =========================================
+   LOGO THEME ADAPTATION
+   ========================================= */
+[data-theme='light'] img[src="/logo.png"] {
+  filter: invert(1);
+  mix-blend-mode: multiply;
+}
+
+/* =========================================
+   GOOGLE STYLE ACCENTS
+   ========================================= */
+:root {
+  --google-blue: #8ab4f8;
+  --google-blue-bg: rgba(138, 180, 248, 0.12);
+  --google-blue-border: rgba(138, 180, 248, 0.25);
+}
+[data-theme='light'] {
+  --google-blue: #1a73e8;
+  --google-blue-bg: rgba(26, 115, 232, 0.1);
+  --google-blue-border: rgba(26, 115, 232, 0.2);
+}

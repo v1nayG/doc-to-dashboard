@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
-  AreaChart, Area, XAxis, YAxis, Tooltip,
+  AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
   ResponsiveContainer,
 } from 'recharts'
 import { COLORS } from './KPICard'
@@ -10,14 +10,21 @@ import { COLORS } from './KPICard'
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="custom-tooltip">
+      <div className="custom-tooltip" style={{
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-strong)',
+        color: 'var(--text-primary)',
+        padding: '8px 12px',
+        borderRadius: 8,
+        boxShadow: 'var(--shadow-sm)'
+      }}>
         {label && <div className="custom-tooltip-label">{label}</div>}
         {payload.map((p, i) => (
           <div key={i} className="custom-tooltip-row" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: i > 0 ? '4px' : '0' }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.color || p.payload?.fill || 'var(--accent)', display: 'inline-block' }} />
             <div className="custom-tooltip-value" style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
               {p.name ? `${p.name}: ` : ''}
-              <strong style={{ color: 'var(--text-primary)', marginLeft: '4px' }}>
+              <strong style={{ color: 'var(--text-primary)', marginLeft: '4px', fontWeight: 500 }}>
                 {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
               </strong>
             </div>
@@ -47,23 +54,23 @@ export default function ChartCard({ chart, index }) {
 
   const commonProps = { data, margin: { top: 10, right: 10, left: -20, bottom: 0 } }
 
-  // Shared SVG filters for glowing effects
+  // Shared SVG filters for glowing effects (softened for Aurora)
   const renderDefs = () => (
     <defs>
       <filter id={`glow_${index}`} x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
       <linearGradient id={`areaGrad_${index}`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor={lineColor} stopOpacity={0.6} />
+        <stop offset="0%" stopColor={lineColor} stopOpacity={0.4} />
         <stop offset="100%" stopColor={lineColor} stopOpacity={0.0} />
       </linearGradient>
       <linearGradient id={`barGrad_${index}`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor={lineColor} stopOpacity={1} />
-        <stop offset="100%" stopColor={lineColor} stopOpacity={0.3} />
+        <stop offset="0%" stopColor={lineColor} stopOpacity={0.85} />
+        <stop offset="100%" stopColor={lineColor} stopOpacity={0.15} />
       </linearGradient>
     </defs>
   );
@@ -74,26 +81,28 @@ export default function ChartCard({ chart, index }) {
         return (
           <BarChart {...commonProps}>
             {renderDefs()}
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} dy={10} />
-            <YAxis axisLine={false} tickLine={false} tick={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 8 }} />
-            <Bar dataKey="value" fill={`url(#barGrad_${index})`} radius={[6, 6, 6, 6]} barSize={32} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis dataKey="label" axisLine={{ stroke: 'var(--border)' }} tickLine={false} tick={{ fontSize: 10 }} dy={10} />
+            <YAxis axisLine={{ stroke: 'var(--border)' }} tickLine={false} tick={{ fontSize: 10 }} dx={-10} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--bg-hover)', radius: 8 }} />
+            <Bar dataKey="value" fill={`url(#barGrad_${index})`} radius={[6, 6, 6, 6]} barSize={24} />
           </BarChart>
         )
       case 'line':
         return (
           <LineChart {...commonProps}>
             {renderDefs()}
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} dy={10} />
-            <YAxis axisLine={false} tickLine={false} tick={false} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis dataKey="label" axisLine={{ stroke: 'var(--border)' }} tickLine={false} tick={{ fontSize: 10 }} dy={10} />
+            <YAxis axisLine={{ stroke: 'var(--border)' }} tickLine={false} tick={{ fontSize: 10 }} dx={-10} />
             <Tooltip content={<CustomTooltip />} />
             <Line 
               type="monotone" 
               dataKey="value"
               stroke={lineColor} 
-              strokeWidth={4}
+              strokeWidth={3}
               dot={false}
-              activeDot={{ r: 6, strokeWidth: 0, fill: '#fff', filter: `url(#glow_${index})` }}
+              activeDot={{ r: 5, strokeWidth: 0, fill: '#fff', filter: `url(#glow_${index})` }}
               filter={`url(#glow_${index})`} 
             />
           </LineChart>
@@ -102,14 +111,15 @@ export default function ChartCard({ chart, index }) {
         return (
           <AreaChart {...commonProps}>
             {renderDefs()}
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} dy={10} />
-            <YAxis axisLine={false} tickLine={false} tick={false} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis dataKey="label" axisLine={{ stroke: 'var(--border)' }} tickLine={false} tick={{ fontSize: 10 }} dy={10} />
+            <YAxis axisLine={{ stroke: 'var(--border)' }} tickLine={false} tick={{ fontSize: 10 }} dx={-10} />
             <Tooltip content={<CustomTooltip />} />
             <Area 
               type="monotone" 
               dataKey="value"
               stroke={lineColor} 
-              strokeWidth={3}
+              strokeWidth={2}
               fill={`url(#areaGrad_${index})`} 
               filter={`url(#glow_${index})`} 
             />

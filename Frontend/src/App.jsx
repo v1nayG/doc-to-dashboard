@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, LogOut, Settings, ChevronDown } from 'lucide-react'
+import { User, LogOut, Settings, ChevronDown, Sun, Moon } from 'lucide-react'
 import axios from 'axios'
 import UploadZone from './components/UploadZone'
 import Dashboard from './components/Dashboard'
@@ -41,6 +41,13 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
+
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
+  
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   const [passwordPromptOpen, setPasswordPromptOpen] = useState(false)
   const [passwordFile, setPasswordFile] = useState(null)
@@ -307,13 +314,22 @@ export default function App() {
             AI Powered
           </span>
           
+          <button 
+            className="btn btn-ghost" 
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            style={{ padding: '8px', marginRight: '4px', borderRadius: '50%', color: 'var(--text-muted)' }}
+            title="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
           <div className="dropdown-container" ref={userMenuRef}>
             <button 
               className="btn btn-ghost" 
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               style={{ padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--border-strong)', borderRadius: '20px' }}
             >
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }}>
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#fbbf24', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600 }}>
                 {(user?.username || user?.email || 'U')[0].toUpperCase()}
               </div>
               <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-primary)' }}>
@@ -404,7 +420,7 @@ export default function App() {
 
                   {isLoading ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 0', gap: '12px' }}>
-                      <div className="loader-spinner" style={{ width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.1)', borderTop: '3px solid var(--accent)' }} />
+                      <div className="loader-spinner" style={{ width: '32px', height: '32px', border: '3px solid var(--border-strong)', borderTop: '3px solid var(--accent)' }} />
                       <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Decrypting and analyzing file…</p>
                     </div>
                   ) : (
@@ -462,16 +478,16 @@ export default function App() {
                   transition={{ duration: 0.5 }}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 8,
-                    background: 'rgba(176,64,144,0.1)',
-                    border: '1px solid rgba(176,64,144,0.25)',
-                    color: '#c8a0e0',
+                    background: 'var(--google-blue-bg)',
+                    border: '1px solid var(--google-blue-border)',
+                    color: 'var(--google-blue)',
                     padding: '5px 16px', borderRadius: 999,
                     fontSize: '0.78rem', fontWeight: 600,
                     letterSpacing: '0.06em', textTransform: 'uppercase',
                     marginBottom: '0.85rem',
                   }}
                 >
-                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#c8a0e0', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--google-blue)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
                   AI-Powered · Document Intelligence
                 </motion.div>
 
@@ -484,15 +500,14 @@ export default function App() {
                     fontWeight: 300,
                     lineHeight: 1.1,
                     letterSpacing: '-0.03em',
-                    color: '#f0f0f5',
+                    color: 'var(--text-primary)',
                     marginBottom: '0.65rem',
                   }}
                 >
                   Turn documents into{' '}
                   <strong style={{
-                    fontWeight: 400, display: 'block',
-                    background: 'linear-gradient(to right, #ffffff, #c8a0e0)',
-                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                    fontWeight: 500, display: 'block',
+                    color: 'var(--google-blue)',
                   }}>
                     live dashboards
                   </strong>
@@ -502,7 +517,7 @@ export default function App() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
-                  style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', maxWidth: 440, lineHeight: 1.6, marginBottom: '1.25rem' }}
+                  style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: 440, lineHeight: 1.6, marginBottom: '1.25rem' }}
                 >
                   Upload a PDF, spreadsheet, or image. AI extracts structured data and builds an interactive dashboard instantly.
                 </motion.p>

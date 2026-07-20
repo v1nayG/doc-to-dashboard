@@ -74,7 +74,7 @@ const extractDashboardData = async (text, fileName) => {
           'X-Title': 'DocDash'
         },
         body: JSON.stringify({
-          model: 'openrouter/owl-alpha',
+          model: 'google/gemma-4-31b-it:free',
           max_tokens: 8192,
           messages: [
             { role: 'system', content: DASHBOARD_PROMPT },
