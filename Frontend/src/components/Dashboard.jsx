@@ -5,7 +5,7 @@ import jsPDF from 'jspdf'
 import KPICard from './KPICard'
 import ChartCard from './ChartCard'
 import DataEditor from './DataEditor'
-import html2canvas from 'html2canvas'
+import domtoimage from 'dom-to-image-more'
 
 export default function Dashboard({ data, onReset, onUpdateDocument }) {
   const [exporting, setExporting] = useState(false)
@@ -33,16 +33,15 @@ export default function Dashboard({ data, onReset, onUpdateDocument }) {
       const dashboardElement = document.getElementById('dashboard-content')
       if (!dashboardElement) return
 
-      const canvas = await html2canvas(dashboardElement, {
+      const dataUrl = await domtoimage.toPng(dashboardElement, {
         scale: 2,
-        useCORS: true,
-        backgroundColor: '#0d0d0d'
+        bgcolor: '#0d0d0d',
+        style: { fontFamily: 'inherit' }
       })
 
-      const image = canvas.toDataURL('image/png')
       const link = document.createElement('a')
-      link.href = image
-      link.download = 'dashboard.png'
+      link.href = dataUrl
+      link.download = `${currentData.title || 'dashboard'}.png`
       link.click()
     } catch (err) {
       console.error('Failed to export PNG', err)
@@ -58,13 +57,16 @@ export default function Dashboard({ data, onReset, onUpdateDocument }) {
       const dashboardElement = document.getElementById('dashboard-content')
       if (!dashboardElement) return
 
-      const canvas = await html2canvas(dashboardElement, {
+      const dataUrl = await domtoimage.toPng(dashboardElement, {
         scale: 2,
-        useCORS: true,
-        backgroundColor: '#0d0d0d'
+        bgcolor: '#0d0d0d',
+        style: { fontFamily: 'inherit' }
       })
 
-      const imgData = canvas.toDataURL('image/png')
+      const img = new Image()
+      img.src = dataUrl
+      await new Promise(resolve => { img.onload = resolve })
+
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -72,10 +74,10 @@ export default function Dashboard({ data, onReset, onUpdateDocument }) {
       })
 
       const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+      const pdfHeight = (img.height * pdfWidth) / img.width
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-      pdf.save('dashboard-report.pdf')
+      pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight)
+      pdf.save(`${currentData.title || 'dashboard'}-report.pdf`)
     } catch (err) {
       console.error('Failed to export PDF', err)
       alert('Failed to export PDF. Please try again.')
