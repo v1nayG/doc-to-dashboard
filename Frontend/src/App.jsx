@@ -9,6 +9,7 @@ import Sidebar from './components/Sidebar'
 import AuthPage from './pages/AuthPage'
 import LandingPage from './pages/LandingPage'
 import UserProfile from './pages/UserProfile'
+import ChartGallery from './pages/ChartGallery'
 import AuthContext from './context/AuthContext'
 import './index.css'
 
@@ -37,7 +38,10 @@ export default function App() {
   const [error, setError] = useState(null)
   const [history, setHistory] = useState([])
   const [activeId, setActiveId] = useState(null)
-  const [page, setPage] = useState(PAGE.LANDING)
+  const [page, setPage] = useState(() => {
+    if (window.location.pathname === '/gallery') return 'gallery';
+    return PAGE.LANDING;
+  })
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
@@ -90,7 +94,7 @@ export default function App() {
 
   // Once auth resolves: if user is logged in, go straight to app
   useEffect(() => {
-    if (!authLoading && user) {
+    if (!authLoading && user && page !== 'gallery' && page !== PAGE.PROFILE) {
       navigate(PAGE.APP)
     }
   }, [authLoading, user])
@@ -271,6 +275,13 @@ export default function App() {
     )
   }
 
+  // ── Chart Gallery ─────────────────────────────
+  if (page === 'gallery') {
+    return (
+      <ChartGallery onBack={() => navigate(PAGE.APP)} />
+    )
+  }
+
   // ── Auth Page ───────────────────────────────
   if (page === PAGE.AUTH || (!user && page !== PAGE.LANDING)) {
     return (
@@ -356,6 +367,11 @@ export default function App() {
                   <button className="dropdown-item" onClick={() => { setUserMenuOpen(false); navigate(PAGE.PROFILE); }}>
                     <User size={14} />
                     Profile Settings
+                  </button>
+
+                  <button className="dropdown-item" onClick={() => { setUserMenuOpen(false); navigate('gallery'); }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                    Chart Gallery
                   </button>
                   
                   <div style={{ height: 1, background: 'var(--border)', margin: '4px 0' }} />
