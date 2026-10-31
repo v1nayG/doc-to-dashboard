@@ -19,14 +19,13 @@ const extractPdfText = async (filePath, password) => {
         const page = await doc.getPage(i);
         const content = await page.getTextContent();
         const pageText = content.items.map(item => item.str).join(' ');
-        fullText += pageText + '\n';
+        fullText += `[[PAGE ${i}]]\n${pageText}\n`;
     }
     return fullText;
 };
 
 /**
- * Determine file type and extract text accordingly.
- * ALL file types are parsed to text locally, then sent to Groq.
+ * Determine file type and extract text locally before sending it to the AI provider.
  * Returns { text }
  */
 const extractText = async (filePath, originalName, password) => {
@@ -71,7 +70,16 @@ const extractText = async (filePath, originalName, password) => {
         return { text: JSON.stringify(jsonArray, null, 2) };
     }
 
-    throw new Error(`Unsupported file type: ${ext}. Supported: PDF, XLSX, CSV`);
+    if (ext === '.txt') {
+        return { text: fs.readFileSync(filePath, 'utf8') };
+    }
+
+    if (ext === '.json') {
+        const content = fs.readFileSync(filePath, 'utf8');
+        return { text: JSON.stringify(JSON.parse(content), null, 2) };
+    }
+
+    throw new Error(`Unsupported file type: ${ext}. Supported: PDF, XLSX, CSV, TXT, JSON`);
 };
 
 module.exports = { extractText };

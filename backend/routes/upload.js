@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { protect } = require('../middleware/authMiddleware');
-const { uploadDocument } = require('../controllers/uploadController');
+const { uploadDocument, uploadDocuments, uploadDocumentsAsync } = require('../controllers/uploadController');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    const allowed = ['.pdf', '.xlsx', '.xls', '.csv'];
+    const allowed = ['.pdf', '.xlsx', '.xls', '.csv', '.txt', '.json'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowed.includes(ext)) {
         cb(null, true);
@@ -32,10 +32,21 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 20 * 1024 * 1024 }
+    limits: { fileSize: 20 * 1024 * 1024, files: 5 }
 });
 
-// POST /api/upload
-router.post('/', protect, upload.single('document'), uploadDocument);
+const handleUploadError = (middleware, field) => (req, res, next) => {
+    middleware(req, res, error => {
+        if (!error) return next();
+        const message = error.code === 'LIMIT_UNEXPECTED_FILE'
+            ? `Upload accepts at most 5 files in the ${field} field.`
+            : error.message;
+        res.status(400).json({ error: message });
+    });
+};
+
+router.post('/', protect, handleUploadError(upload.single('document'), 'document'), uploadDocument);
+router.post('/batch', protect, handleUploadError(upload.array('documents', 5), 'documents'), uploadDocuments);
+router.post('/async', protect, handleUploadError(upload.array('documents', 5), 'documents'), uploadDocumentsAsync);
 
 module.exports = router;

@@ -1,7 +1,12 @@
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/User');
 
 const protect = async (req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({ error: 'Authentication is unavailable because the database is not connected.' });
+    }
+
     let token;
 
     if (

@@ -106,28 +106,47 @@ export default function App() {
     } catch (_) {}
   }
 
-  const handleUpload = async (file, password = '') => {
+  const handleUpload = async (inputFiles, password = '') => {
+    const files = (Array.isArray(inputFiles) ? inputFiles : [inputFiles]).filter(Boolean)
+    if (!files.length) return
+    const isBatch = files.length > 1
     setIsLoading(true)
     setError(null)
     setDashboardData(null)
 
     const formData = new FormData()
-    formData.append('document', file)
+    files.forEach(file => formData.append(isBatch ? 'documents' : 'document', file))
     if (password) {
       formData.append('password', password)
     }
 
     try {
-      const res = await axios.post(`${API_BASE}/upload`, formData, {
+      const res = await axios.post(`${API_BASE}/upload${isBatch ? '/batch' : ''}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 120000,
+        timeout: isBatch ? 600000 : 240000,
       })
       if (res.data.success) {
-        const d = res.data.data;
+        const uploadedDocuments = isBatch ? res.data.documents : [res.data.data]
+        const d = uploadedDocuments[0]
         const docId = d._id ? d._id.toString() : null;
         setDashboardData(d)
         setActiveId(docId)
-        console.log('[upload] activeId set to:', docId);
+        if (isBatch) {
+          const addedHistory = uploadedDocuments.filter(document => document._id).map(document => ({
+            _id: document._id,
+            fileName: document.fileName,
+            fileType: document.fileName?.split('.').pop()?.toLowerCase(),
+            dashboardData: {
+              title: document.title,
+              document_type: document.document_type,
+              summary: document.summary,
+            },
+          }))
+          setHistory(previous => [...addedHistory, ...previous.filter(item => !addedHistory.some(added => added._id === item._id))])
+          if (res.data.errors?.length) {
+            setError(res.data.errors.map(item => `${item.fileName}: ${item.error}`).join(' '))
+          }
+        }
         fetchHistory()
         
         // Reset password prompt state
@@ -141,7 +160,7 @@ export default function App() {
       setIsLoading(false)
       if (err.response?.status === 401 && err.response?.data?.requiresPassword) {
         setPasswordPromptOpen(true)
-        setPasswordFile(file)
+        setPasswordFile(files[0])
         setPasswordError(password ? 'Incorrect password. Please try again.' : null)
       } else {
         const msg = err.response?.data?.error || err.message || 'Upload failed. Please try again.'
@@ -507,7 +526,9 @@ export default function App() {
                   Turn documents into{' '}
                   <strong style={{
                     fontWeight: 500, display: 'block',
-                    color: 'var(--google-blue)',
+                    background: 'linear-gradient(90deg, #ffffff, #c8a0e0)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
                   }}>
                     live dashboards
                   </strong>
@@ -519,7 +540,7 @@ export default function App() {
                   transition={{ delay: 0.2, duration: 0.6 }}
                   style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: 440, lineHeight: 1.6, marginBottom: '1.25rem' }}
                 >
-                  Upload a PDF, spreadsheet, or image. AI extracts structured data and builds an interactive dashboard instantly.
+                  Upload up to five PDFs, spreadsheets, CSV, TXT, or JSON files. AI extracts structured data and builds an interactive dashboard.
                 </motion.p>
               </div>
 
@@ -539,8 +560,8 @@ export default function App() {
               {/* Feature chips */}
               <div className="feature-list">
                 {[
-                  'OCR for scanned docs',
-                  'Gemini AI analysis',
+                  'PDF, spreadsheet & text extraction',
+                  'Configurable AI analysis',
                   'Auto chart generation',
                   'Document history',
                   'Export as PNG',
@@ -553,7 +574,15 @@ export default function App() {
               </div>
             </>
           ) : (
-            <Dashboard data={dashboardData} onReset={handleReset} onUpdateDocument={handleUpdateDocument} />
+            <>
+              {error && <div className="error-banner" role="alert">{error}</div>}
+              <Dashboard
+                data={dashboardData}
+                documents={history}
+                onReset={handleReset}
+                onUpdateDocument={handleUpdateDocument}
+              />
+            </>
           )}
         </div>
       </div>

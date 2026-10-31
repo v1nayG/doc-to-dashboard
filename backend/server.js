@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const path = require('path');
 const dns = require('dns');
+const { startKeepAlive } = require('./services/keepAliveService');
+const { requestContext } = require('./middleware/requestContext');
 
 // Force Node.js to use Google DNS to bypass ISP blocking of MongoDB SRV records
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -12,6 +14,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+app.set('trust proxy', Number.parseInt(process.env.TRUST_PROXY_HOPS, 10) || 0);
+app.disable('x-powered-by');
+app.use(requestContext);
 
 // ─── CORS ──────────────────────────────────────────────────────────────────────
 // Only allow requests from the configured frontend origin
@@ -27,9 +32,22 @@ app.use(cors({
         callback(new Error(`CORS: origin '${origin}' is not allowed`));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
+    exposedHeaders: ['X-Request-Id'],
 }));
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
+app.get('/ready', (req, res) => {
+    const databaseConnected = mongoose.connection.readyState === 1;
+    res.status(databaseConnected ? 200 : 503).json({
+        status: databaseConnected ? 'ready' : 'not_ready',
+        database: databaseConnected ? 'connected' : 'disconnected'
+    });
+});
 
 const { authLimiter, uploadLimiter, generalLimiter } = require('./middleware/rateLimiter');
 
@@ -43,6 +61,8 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/api/auth',    authLimiter,   require('./routes/auth'));
 app.use('/api/upload',  uploadLimiter, require('./routes/upload'));
 app.use('/api/history',                require('./routes/history'));
+app.use('/api/chat',                   require('./routes/chat'));
+app.use('/api/insights',               require('./routes/insights'));
 
 // Health check
 app.get('/', (req, res) => {
@@ -55,6 +75,7 @@ const startServer = async () => {
         console.log(`🚀 Server running on http://localhost:${PORT}`);
         console.log(`🔒 CORS allowed origins: ${allowedOrigins.join(', ')}`);
     });
+    startKeepAlive();
 
     if (process.env.MONGODB_URI && !process.env.MONGODB_URI.includes('<username>')) {
         try {

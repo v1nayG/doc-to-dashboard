@@ -18,6 +18,14 @@ const uploadLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+const chatLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 20,
+    message: { error: 'Too many chat requests. Please wait a moment and try again.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // General API — broad safety net for all other routes
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,  // 15 minutes
@@ -30,5 +38,6 @@ const generalLimiter = rateLimit({
 module.exports = {
     authLimiter,
     uploadLimiter,
+    chatLimiter,
     generalLimiter,
 };

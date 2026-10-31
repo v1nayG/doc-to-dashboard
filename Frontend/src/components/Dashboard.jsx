@@ -5,9 +5,10 @@ import jsPDF from 'jspdf'
 import KPICard from './KPICard'
 import ChartCard from './ChartCard'
 import DataEditor from './DataEditor'
+import DocumentChat from './DocumentChat'
 import domtoimage from 'dom-to-image-more'
 
-export default function Dashboard({ data, onReset, onUpdateDocument }) {
+export default function Dashboard({ data, documents = [], onReset, onUpdateDocument }) {
   const [exporting, setExporting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
@@ -304,6 +305,7 @@ export default function Dashboard({ data, onReset, onUpdateDocument }) {
           </div>
         )}
       </div>
+      <DocumentChat documents={documents} activeDocumentId={currentData._id ? String(currentData._id) : ''} />
     </motion.div>
   )
 }

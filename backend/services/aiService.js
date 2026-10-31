@@ -1,6 +1,4 @@
-const Groq = require('groq-sdk');
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const { generateWithFallback } = require('./aiProviders');
 
 const DASHBOARD_PROMPT = `
 You are a data extraction and dashboard generation expert.
@@ -54,59 +52,43 @@ Rules:
 - Return ONLY valid JSON — no markdown, no backticks, no explanation
 `;
 
-const extractDashboardData = async (text, fileName) => {
-  const truncated = text.substring(0, 30000);
-  console.log(`📄 Processing "${fileName}" (${text.length} chars) → routing to Owl Alpha on OpenRouter`);
-  
-  if (!process.env.OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY is not configured in backend .env file');
+const parseDashboardResponse = content => {
+  const raw = content
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim();
+  const result = JSON.parse(raw);
+  if (!result || typeof result !== 'object' || Array.isArray(result)) {
+    throw new Error('AI response must be a dashboard object');
   }
-
-  try {
-    const response = await fetch(
-      'https://openrouter.ai/api/v1/chat/completions',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/v1nayG/doc-to-dashboard',
-          'X-Title': 'DocDash'
-        },
-        body: JSON.stringify({
-          model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
-          max_tokens: 8192,
-          messages: [
-            { role: 'system', content: DASHBOARD_PROMPT },
-            {
-              role: 'user',
-              content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
-            }
-          ],
-          temperature: 0.1,
-          response_format: { type: 'json_object' }
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
-    }
-
-    const data = await response.json();
-    let raw = data?.choices[0]?.message?.content?.trim();
-
-    if (!raw) {
-      throw new Error('AI returned an empty response. Please try again.');
-    }
-
-    raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-    return JSON.parse(raw);
-  } catch (error) {
-    console.error('❌ OpenRouter API Error:', error.message);
-    throw new Error(`AI processing failed: ${error.message}`);
+  if (!Array.isArray(result.kpis) || !Array.isArray(result.charts) || !Array.isArray(result.tables)) {
+    throw new Error('AI response is missing dashboard sections');
   }
+  return result;
 };
 
-module.exports = { extractDashboardData };
+const extractDashboardData = async (text, fileName) => {
+  const truncated = text.substring(0, 30000);
+    console.log(`Processing "${fileName}" (${text.length} chars) with configured AI provider`);
+
+    try {
+        const result = await generateWithFallback([
+            { role: 'system', content: DASHBOARD_PROMPT },
+            {
+                role: 'user',
+                content: `Analyze this document and extract dashboard data.\n\nFile: ${fileName}\n\nDocument content:\n${truncated}`
+            }
+        ], {
+          maxTokens: 8192,
+          temperature: 0.1,
+          validate: parseDashboardResponse
+        });
+        return { ...parseDashboardResponse(result.content), aiProvider: result.provider, aiModel: result.model };
+    } catch (error) {
+        console.error('AI dashboard extraction failed:', error.message);
+        throw new Error(`AI processing failed: ${error.message}`);
+    }
+};
+
+module.exports = { extractDashboardData, parseDashboardResponse };

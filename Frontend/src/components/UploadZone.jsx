@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { motion } from 'framer-motion'
+import { motion as Motion } from 'framer-motion'
 
 const UploadSVG = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -14,7 +14,7 @@ export default function UploadZone({ onUpload, isLoading }) {
   const [dragActive, setDragActive] = useState(false)
 
   const onDrop = useCallback((acceptedFiles) => {
-    if (acceptedFiles.length > 0) onUpload(acceptedFiles[0])
+    if (acceptedFiles.length > 0) onUpload(acceptedFiles)
   }, [onUpload])
 
   const { getRootProps, getInputProps, open } = useDropzone({
@@ -24,19 +24,21 @@ export default function UploadZone({ onUpload, isLoading }) {
     onDropAccepted: () => setDragActive(false),
     accept: {
       'application/pdf': ['.pdf'],
-      'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
       'text/csv': ['.csv'],
+      'text/plain': ['.txt'],
+      'application/json': ['.json'],
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
       'application/vnd.ms-excel': ['.xls'],
     },
     maxSize: 20 * 1024 * 1024,
+    maxFiles: 5,
     noClick: true,
     disabled: isLoading,
   })
 
   return (
     <div className="upload-section">
-      <motion.div
+      <Motion.div
         {...getRootProps()}
         className={`upload-zone ${dragActive ? 'dragging' : ''}`}
         whileHover={{ scale: 1.005 }}
@@ -48,28 +50,28 @@ export default function UploadZone({ onUpload, isLoading }) {
           <UploadSVG />
         </div>
 
-        <h3>{dragActive ? 'Release to upload' : 'Upload your document'}</h3>
+        <h3>{dragActive ? 'Release to upload' : 'Upload your documents'}</h3>
         <p>
-          Drag & drop, or click the button below.<br />
+          Drag & drop up to 5 files, or choose them below.<br />
           AI will generate an interactive dashboard.
         </p>
 
-        <motion.button
+        <Motion.button
           className="upload-btn"
           onClick={open}
           whileTap={{ scale: 0.97 }}
           disabled={isLoading}
         >
           {isLoading ? 'Processing…' : 'Choose file'}
-        </motion.button>
+        </Motion.button>
 
         <div className="upload-formats">
-          {['PDF', 'Excel', 'CSV', 'JPG', 'PNG'].map(type => (
+          {['PDF', 'Excel', 'CSV', 'TXT', 'JSON'].map(type => (
             <span key={type} className="format-tag">{type}</span>
           ))}
         </div>
-        <p className="upload-hint">Max 20 MB</p>
-      </motion.div>
+        <p className="upload-hint">Max 20 MB per file · 5 files per upload</p>
+      </Motion.div>
     </div>
   )
 }
