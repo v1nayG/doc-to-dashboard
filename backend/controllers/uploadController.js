@@ -25,8 +25,10 @@ const uploadDocument = async (req, res) => {
             });
         }
 
-        // Send extracted text to Groq AI for analysis
+        // Process document: RAG chunking → fallback model chain → (parallel if large doc)
+        const t0 = Date.now();
         const dashboardData = await extractDashboardData(text, originalName);
+        console.log(`[Upload] "${originalName}" fully processed in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 
         // Add metadata
         dashboardData.fileName = originalName;
