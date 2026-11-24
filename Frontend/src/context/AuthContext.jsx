@@ -5,8 +5,9 @@ const AuthContext = createContext();
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // Auth disabled for testing: provide default test user
+    const [user, setUser] = useState({ _id: '000000000000000000000001', username: 'testuser', email: 'test@example.com' });
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     // Set auth token for axios requests
@@ -30,8 +31,7 @@ export const AuthProvider = ({ children }) => {
                     const res = await axios.get(`${API_BASE}/auth/me`);
                     setUser(res.data);
                 } catch (err) {
-                    setAuthToken(null);
-                    setUser(null);
+                    // Keep mock user for testing even if /me fails
                 }
             }
             setLoading(false);
